@@ -1,0 +1,336 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace PlotFourVR
+{
+    public class NodeParent : MonoBehaviour
+    {
+        [SerializeField] private Transform nodePrefab;
+        [SerializeField] private float nodeSpacing; // Space between nodes
+
+        private int rowCount;
+        private int columnCount;
+        private int winLength;
+
+        private Vector2 mousePosition;
+
+        private List<Node> nodes = new();
+        private Dictionary<Vector2Int, NodeType> nodeDictionary = new();
+
+        private InputAction pauseAction;
+        private InputAction uiClickAction;
+        private InputAction mousePositionAction;
+
+        private PlayerInput playerInput;
+
+        private StateType currentStateType;
+
+        public int PlayedTileCount => playedTileCount; // Number of tiles played by the player  
+        private int playedTileCount = 0; // Number of tiles played
+        private int totalTileCount = 0; // Total number of tiles in the grid
+        public float PlayTime => playTime; // Time spent playing the game
+        private float playTime = 0; // Time spent playing the game
+
+        // Directions: horizontal, vertical, diag down-right, diag down-left
+        (int dr, int dc)[] directions = {
+            (0, 1),
+            (1, 0),
+            (1, 1),
+            (1, -1)
+        };
+
+        private void Awake()
+        {
+            playerInput = GetComponent<PlayerInput>();
+
+            uiClickAction = playerInput.actions["Click"];
+            mousePositionAction = playerInput.actions["Point"];
+
+            RuntimeController.Instance.GameStateChanged += OnGameStateChanged;
+
+            uiClickAction.performed += OnUiClickActionPerformed;
+            mousePositionAction.performed += OnMousePositionActionPerformed;
+        }
+
+        private void Update()
+        {
+            // Check if one of the players is playing
+            if (currentStateType == StateType.PlayerOneTurn || currentStateType == StateType.PlayerTwoTurn)
+            {
+                // Update play time
+                playTime += Time.deltaTime;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            RuntimeController.Instance.GameStateChanged -= OnGameStateChanged;
+
+            uiClickAction.performed -= OnUiClickActionPerformed;
+            mousePositionAction.performed -= OnMousePositionActionPerformed;
+        }
+
+        private void OnGameStateChanged(StateType stateType)
+        {
+            currentStateType = stateType;
+            if (stateType == StateType.GameStarting)
+            {
+                // Draw the grid of nodes
+                DrawGrid();
+            }
+            else if (stateType == StateType.GameOver)
+            {
+                // Handle game over state
+                RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(MenuType.GameOverMenu);
+            }
+        }
+
+        private void OnMousePositionActionPerformed(InputAction.CallbackContext context)
+        {
+            mousePosition = context.ReadValue<Vector2>();
+        }
+
+        private void OnUiClickActionPerformed(InputAction.CallbackContext context)
+        {
+            bool clickResult = context.ReadValueAsButton();
+            if (!clickResult) return;
+
+            // Raycast from camera through the mouse position
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+                // Check if the raycast hit a node
+                NodeColliderWrapper nodeColliderWrapper = hit.collider.GetComponent<NodeColliderWrapper>();
+                if (nodeColliderWrapper != null)
+                {
+                    // Handle the interaction with the node
+                    nodeColliderWrapper.TriggerCollisionInteraction();
+                }
+            }
+        }
+
+        private void DrawGrid()
+        {
+            rowCount = RuntimeController.Instance.RowCount;
+            columnCount = RuntimeController.Instance.ColumnCount;
+            winLength = RuntimeController.Instance.WinLength;
+            RuntimeController.Instance.GameResult = ResultType.None;
+
+            nodeDictionary.Clear();
+            nodes.Clear();
+            // Clear existing nodes
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // Start play time
+            playTime = 0f;
+            // Set total tile count
+            totalTileCount = rowCount * columnCount;
+            // reset played tile count
+            playedTileCount = 0;
+
+            // Initialize the node dictionary
+            nodeDictionary = new Dictionary<Vector2Int, NodeType>();
+
+            // position parent transform at the center of the grid
+            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing), transform.position.y, transform.position.z);
+
+            // Initialize the grid of nodes
+            for (int row = 0; row < rowCount; row++)
+            {
+                for (int column = 0; column < columnCount; column++)
+                {
+                    Node node = new Node(row, column, NodeType.Empty);
+                    nodes.Add(node);
+
+                    node.NodeInteracted += OnNodeInteracted;
+
+                    // Add the node to the dictionary
+                    nodeDictionary.Add(new Vector2Int(row, column), NodeType.Empty);
+
+                    // Instantiate the node prefab
+                    Transform nodeTransform = Instantiate(nodePrefab, new Vector3(column, 0, row), Quaternion.identity, transform);
+
+                    // Name node game object according to its position
+                    nodeTransform.name = $"Node_{row}_{column}";
+
+                    // Set the position of the node
+                    nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
+
+                    // Add the Node component to the node
+                    NodeVisual nodeComponent = nodeTransform.GetComponent<NodeVisual>();
+
+                    // Initialize the node with its row and column index
+                    nodeComponent.Initialize(node);
+                }
+            }
+
+            RuntimeController.Instance.SetCurrentState(StateType.PlayerOneTurn);
+        }
+
+        private void OnNodeInteracted(Node node)
+        {
+            // Check if game state is not GameStarting or GameOver
+            if (currentStateType is StateType.GameStarting or StateType.GameOver) return;
+
+            // Get the first available node in the column
+            Node firstAvailableNode = GetFirstAvailableNodeInColumn(node.ColumnIndex);
+            if (firstAvailableNode == null) return;
+
+            // Set the node type to the active player's node type
+            if (currentStateType == StateType.PlayerOneTurn)
+            {
+                firstAvailableNode.NodeType = RuntimeController.Instance.PlayerOneNodeType;
+            }
+            else if (currentStateType == StateType.PlayerTwoTurn)
+            {
+                firstAvailableNode.NodeType = RuntimeController.Instance.PlayerTwoNodeType;
+            }
+            playedTileCount++;
+            // check if it is the winning move
+            if (IsWinningMove(firstAvailableNode))
+            {
+                if (currentStateType == StateType.PlayerOneTurn)
+                {
+                    RuntimeController.Instance.GameResult = ResultType.PlayerOneWin;
+                }
+                else if (currentStateType == StateType.PlayerTwoTurn)
+                {
+                    RuntimeController.Instance.GameResult = ResultType.PlayerTwoWin;
+                }
+                RuntimeController.Instance.SetCurrentState(StateType.GameOver);
+            }
+            // Check if the game is a draw
+            else if (playedTileCount >= totalTileCount)
+            {
+                RuntimeController.Instance.GameResult = ResultType.Draw;
+                RuntimeController.Instance.SetCurrentState(StateType.GameOver);
+            }
+            else
+            {
+                // Switch to the other player's turn
+                if (currentStateType == StateType.PlayerOneTurn)
+                {
+                    RuntimeController.Instance.SetCurrentState(StateType.PlayerTwoTurn);
+                }
+                else if (currentStateType == StateType.PlayerTwoTurn)
+                {
+                    RuntimeController.Instance.SetCurrentState(StateType.PlayerOneTurn);
+                }
+            }
+        }
+
+        // Check if placing at (row,col) for `player` makes four in a row
+        public bool IsWinningMove(Node node)
+        {
+            int row = node.RowIndex;
+            int col = node.ColumnIndex;
+            NodeType activePlayersNodeType = node.NodeType;
+
+            foreach (var (dr, dc) in directions)
+            {
+                int count = 0;
+                // Slide a window from -(winLength - 1) to (winLength - 1) around the new piece
+                int slideDistance = winLength - 1; // The distance to slide the window
+                for (int i = -slideDistance; i <= slideDistance; i++)
+                {
+                    int r = row + i * dr;
+                    int c = col + i * dc;
+
+                    // Check if the position is within bounds
+                    if (r >= 0 && r < rowCount && c >= 0 && c < columnCount)
+                    {
+                        // Check if the node is matches the player's type
+                        if (GetNode(r, c).NodeType == activePlayersNodeType)
+                        {
+                            count++;
+                            if (count >= winLength)
+                            {
+                                return true;
+                            }
+
+                        }
+                        else
+                        {
+                            count = 0;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private Node GetFirstAvailableNodeInColumn(int columnIndex)
+        {
+            Node firstAvailableNode = null;
+            // Check nodes in the specified column from bottom to top
+            for (int row = 0; row < rowCount; row++)
+            {
+                Node node = GetNode(row, columnIndex);
+                if (node != null && node.NodeType == NodeType.Empty)
+                {
+                    firstAvailableNode = node;
+                    break;
+                }
+            }
+            if (firstAvailableNode != null)
+            {
+                return firstAvailableNode;
+            }
+            Debug.LogWarning($"No available node found in column {columnIndex}");
+            return null;
+        }
+
+        public Node GetNode(int rowIndex, int columnIndex)
+        {
+            foreach (Node node in nodes)
+            {
+                if (node.RowIndex == rowIndex && node.ColumnIndex == columnIndex)
+                {
+                    return node;
+                }
+            }
+            Debug.LogWarning($"Node at ({rowIndex}, {columnIndex}) not found.");
+            return default;
+        }
+    }
+
+    [Serializable]
+    public class Node
+    {
+        public event Action<Node> NodeInteracted;
+        public event Action<NodeType> NodeTypeChanged;
+
+        public Node(int rowIndex, int columnIndex, NodeType nodeType)
+        {
+            this.rowIndex = rowIndex;
+            this.columnIndex = columnIndex;
+            this.nodeType = nodeType;
+        }
+        public int RowIndex => rowIndex;
+        [SerializeField] private int rowIndex;
+        public int ColumnIndex => columnIndex;
+        [SerializeField] private int columnIndex;
+        public NodeType NodeType 
+        { 
+            get => nodeType; 
+            set
+                {
+                    nodeType = value;
+                    NodeTypeChanged?.Invoke(nodeType);
+                }
+        }
+        [SerializeField] private NodeType nodeType;
+
+
+        public void Interact()
+        {
+            NodeInteracted?.Invoke(this);
+        }
+    }
+}
