@@ -17,14 +17,8 @@ namespace PlotFourVR
 
         private Vector2 mousePosition;
 
-        private List<Node> nodes = new();
-        private Dictionary<Vector2Int, NodeType> nodeDictionary = new();
+        private Dictionary<Node, Transform> nodeDictionary = new();
         private Dictionary<int, Transform> columnHeads = new();
-
-        private InputAction uiClickAction;
-        private InputAction mousePositionAction;
-
-        private PlayerInput playerInput;
 
         private StateType currentStateType;
 
@@ -48,19 +42,11 @@ namespace PlotFourVR
 
         public void Initialize(RuntimeController runtimeController)
         {
-            playerInput = GetComponent<PlayerInput>();
-
-            uiClickAction = playerInput.actions["Click"];
-            mousePositionAction = playerInput.actions["Point"];
-
             this.runtimeController = runtimeController;
 
             // Subscribe to events
             runtimeController.GameStateChanged += OnGameStateChanged;
             runtimeController.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
-
-            uiClickAction.performed += OnUiClickActionPerformed;
-            mousePositionAction.performed += OnMousePositionActionPerformed;
 
             // Draw the grid
             DrawGrid();
@@ -80,9 +66,6 @@ namespace PlotFourVR
         {
             runtimeController.GameStateChanged -= OnGameStateChanged;
             runtimeController.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
-
-            uiClickAction.performed -= OnUiClickActionPerformed;
-            mousePositionAction.performed -= OnMousePositionActionPerformed;
         }
 
         private void OnGameStateChanged(StateType stateType)
@@ -99,31 +82,6 @@ namespace PlotFourVR
             }
         }
 
-        private void OnMousePositionActionPerformed(InputAction.CallbackContext context)
-        {
-            mousePosition = context.ReadValue<Vector2>();
-        }
-
-        private void OnUiClickActionPerformed(InputAction.CallbackContext context)
-        {
-            bool clickResult = context.ReadValueAsButton();
-            if (!clickResult) return;
-
-            // Raycast from camera through the mouse position
-            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Check if the raycast hit a node
-                ColliderWrapper nodeColliderWrapper = hit.collider.GetComponent<ColliderWrapper>();
-                if (nodeColliderWrapper != null)
-                {
-                    // Handle the interaction with the node
-                    nodeColliderWrapper.TriggerCollisionInteraction();
-                }
-            }
-        }
-
         private void DrawGrid()
         {
             rowCount = runtimeController.RowCount;
@@ -132,7 +90,6 @@ namespace PlotFourVR
             runtimeController.GameResult = ResultType.None;
 
             nodeDictionary.Clear();
-            nodes.Clear();
             columnHeads.Clear();
             // Clear existing nodes
             foreach (Transform child in transform)
@@ -147,61 +104,53 @@ namespace PlotFourVR
             // reset played tile count
             playedTileCount = 0;
 
-            // Initialize the node dictionary
-            nodeDictionary = new Dictionary<Vector2Int, NodeType>();
-
             // position parent transform at the center of the grid
             float xOffset = columnCount  * 0.03f;
             transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing) + xOffset, transform.position.y, transform.position.z);
 
+            // Initialize the column heads
+            for (int column = 0; column < columnCount; column++)
+            {
+                // Instantiate the column head prefab
+                Transform columnHeadTransform = Instantiate(columnHead, transform);
+
+                // Name column head game object according to its position
+                columnHeadTransform.name = $"ColumnHead_{column}";
+
+                // Set the position of the column head
+                columnHeadTransform.localPosition = new Vector3(column * nodeSpacing, rowCount * nodeSpacing, 0f);
+
+                // Pass the column index to the column head component
+                ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
+                columnHeadComponent.Initialize(runtimeController, this, column, rowCount);
+
+                // Add the column head to the dictionary
+                columnHeads.Add(column, columnHeadTransform);
+
+            }
+
             // Initialize the grid of nodes
-            for (int row = 0; row < rowCount + 1; row++)
+            for (int row = 0; row < rowCount; row++)
             {
                 for (int column = 0; column < columnCount; column++)
                 {
-                    // Create a new node each rowCount
-                    if (row < rowCount)
-                    {
-                        Node node = new Node(row, column, NodeType.Empty);
-                        nodes.Add(node);
+                    Node node = new Node(row, column, NodeType.Empty);
 
-                        // Add the node to the dictionary
-                        nodeDictionary.Add(new Vector2Int(row, column), NodeType.Empty);
+                    // Instantiate the node prefab
+                    Transform nodeTransform = Instantiate(nodePrefab, new Vector3(column, 0, row), Quaternion.identity, transform);
+                    nodeDictionary.Add(node, nodeTransform);
 
-                        // Instantiate the node prefab
-                        Transform nodeTransform = Instantiate(nodePrefab, new Vector3(column, 0, row), Quaternion.identity, transform);
+                    // Name node game object according to its position
+                    nodeTransform.name = $"Node_{row}_{column}";
 
-                        // Name node game object according to its position
-                        nodeTransform.name = $"Node_{row}_{column}";
+                    // Set the position of the node
+                    nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
 
-                        // Set the position of the node
-                        nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
+                    // Add the Node component to the node
+                    NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
 
-                        // Add the Node component to the node
-                        NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
-
-                        // Initialize the node with its row and column index
-                        nodeVisual.Initialize(runtimeController, node);
-                    }
-                    // Create a column head on top of each column
-                    else if (row == rowCount)
-                    {
-                        // Instantiate the column head prefab
-                        Transform columnHeadTransform = Instantiate(columnHead, new Vector3(column, 0, row), Quaternion.identity, transform);
-
-                        // Name column head game object according to its position
-                        columnHeadTransform.name = $"ColumnHead_{column}";
-
-                        // Set the position of the column head
-                        columnHeadTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
-
-                        // Pass the column index to the column head component
-                        ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
-                        columnHeadComponent.Initialize(runtimeController, column);
-
-                        // Add the column head to the dictionary
-                        columnHeads.Add(column, columnHeadTransform);
-                    }
+                    // Initialize the node with its row and column index
+                    nodeVisual.Initialize(runtimeController, node, columnHeads[column].position);
                 }
             }
 
@@ -229,6 +178,8 @@ namespace PlotFourVR
             {
                 firstAvailableNode.NodeType = runtimeController.PlayerTwoNodeType;
             }
+            runtimeController.EventBus.InteractionEvents.InvokeNodeTypeChanged(firstAvailableNode);
+
             playedTileCount++;
             // check if it is the winning move
             if (IsWinningMove(firstAvailableNode))
@@ -326,23 +277,34 @@ namespace PlotFourVR
 
         public Node GetNode(int rowIndex, int columnIndex)
         {
-            foreach (Node node in nodes)
+            // Get the node from the dictionary using the row and column index
+            foreach (KeyValuePair<Node, Transform> kvp in nodeDictionary)
             {
-                if (node.RowIndex == rowIndex && node.ColumnIndex == columnIndex)
+                if (kvp.Key.RowIndex == rowIndex && kvp.Key.ColumnIndex == columnIndex)
                 {
-                    return node;
+                    return kvp.Key;
                 }
             }
+
             Debug.LogWarning($"Node at ({rowIndex}, {columnIndex}) not found.");
             return default;
+        }
+
+        public Transform GetNodeTransform(Node node)
+        {
+            // Get the transform of the node from the dictionary
+            if (nodeDictionary.TryGetValue(node, out Transform nodeTransform))
+            {
+                return nodeTransform;
+            }
+            Debug.LogWarning($"Node transform for {node} not found.");
+            return null;
         }
     }
 
     [Serializable]
     public class Node
     {
-        public event Action<NodeType> NodeTypeChanged;
-
         public Node(int rowIndex, int columnIndex, NodeType nodeType)
         {
             this.rowIndex = rowIndex;
@@ -353,15 +315,7 @@ namespace PlotFourVR
         [SerializeField] private int rowIndex;
         public int ColumnIndex => columnIndex;
         [SerializeField] private int columnIndex;
-        public NodeType NodeType 
-        { 
-            get => nodeType; 
-            set
-                {
-                    nodeType = value;
-                    NodeTypeChanged?.Invoke(nodeType);
-                }
-        }
+        public NodeType NodeType { get => nodeType; set => nodeType = value;}
         [SerializeField] private NodeType nodeType;
     }
 }

@@ -21,5 +21,11 @@ namespace PlotFourVR
         {
             NodeInteracted?.Invoke(node);
         }
+
+        public event Action<Node> NodeTypeChanged;
+        public void InvokeNodeTypeChanged(Node node)
+        {
+            NodeTypeChanged?.Invoke(node);
+        }
     }
 }

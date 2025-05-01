@@ -1,83 +1,100 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlotFourVR
 {
     public class ColumnHeadBehaviour : MonoBehaviour
     {
-        private const float HIGHLIGHT_SCALE = 1f; // Scale factor for highlighting
-        private const float DEFAULT_SCALE = 0.1f; // Default scale for the column head
+        [SerializeField] private Transform diskPrefab;
 
-        [SerializeField] private Material defaultMaterual;
         [SerializeField] private Material redHighlightMaterial;
         [SerializeField] private Material yellowHighlightMaterial;
 
         private int columnIndex; // The index of the column this head belongs to
-        private MeshRenderer meshRenderer;
-        private RuntimeController runtimeController;
 
-        public void Initialize(RuntimeController runtimeController, int columnIndex)
+        private List<NodeDisk> nodeDisks;
+
+        private RuntimeController runtimeController;
+        private NodeParent nodeParent;
+
+        public void Initialize(RuntimeController runtimeController, NodeParent nodeParent, int columnIndex, int rowCount)
         {
             this.runtimeController = runtimeController;
+            this.nodeParent = nodeParent;
             this.columnIndex = columnIndex;
-
-            meshRenderer = GetComponentInChildren<MeshRenderer>();
 
             runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
             runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
+            runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
 
-            // Apply default visual properties
-            RemoveHighlightFromColumnHead();
+            // create disk pool 
+            nodeDisks = new List<NodeDisk>(rowCount);
+            for (int i = 0; i < rowCount; i++)
+            {
+                NodeDisk disk = Instantiate(diskPrefab, transform).GetComponent<NodeDisk>();
+                disk.Hide();
+                nodeDisks.Add(disk);
+            }
         }
 
         private void OnDestroy()
         {
             runtimeController.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
             runtimeController.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
+            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
         }
 
         private void OnNodeHoverEntered(Node node)
         {
-            if (node.ColumnIndex == columnIndex)
+            if (node.ColumnIndex != columnIndex) return;
+
+            // Highlight the column head
+            // if the current state is not of the player turns, do not highlight
+            if (runtimeController.CurrentState != StateType.PlayerOneTurn &&
+                runtimeController.CurrentState != StateType.PlayerTwoTurn) return;
+
+            // get the first disk from the queue
+            if (nodeDisks.Count == 0)
             {
-                // Highlight the column head
-                HighlightColumnHead();
+                Debug.LogWarning($"No disks available to highlight for pos: r{node.RowIndex}-c{node.ColumnIndex}");
+                return;
+            }
+            nodeDisks[0].Show();
+
+            // Set the highlight material depending on the player turn
+            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
+            {
+                nodeDisks[0].SetMaterial(NodeType.Yellow);
+            }
+            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
+            {
+                nodeDisks[0].SetMaterial(NodeType.Red);
             }
         }
 
         private void OnNodeHoverExited(Node node)
         {
-            if (node.ColumnIndex == columnIndex)
-            {
-                // Remove highlight from the column head
-                RemoveHighlightFromColumnHead();
-            }
+            if (node.ColumnIndex != columnIndex) return;
+
+            // defensive check for the last disk, that is not going to be hidden
+            if (nodeDisks.Count == 0) return;
+            nodeDisks[0].Hide();
         }
 
-        private void HighlightColumnHead()
+        private void OnNodeTypeChanged(Node node)
         {
-            // if the current state is not of the player turns, do not highlight
-            if (runtimeController.CurrentState != StateType.PlayerOneTurn &&
-                runtimeController.CurrentState != StateType.PlayerTwoTurn) return;
-            
-            transform.localScale = Vector3.one * HIGHLIGHT_SCALE; // Example scaling for highlight effect
+            if(node.ColumnIndex != columnIndex) return;
 
-            // Set the highlight material depending on the player turn
-            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
-            {
-                meshRenderer.material = yellowHighlightMaterial;
-            }
-            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
-            {
-                meshRenderer.material = redHighlightMaterial;
-            }
-        }
+            // move the disk to the node position
+            Vector3 targetPosition = nodeParent.GetNodeTransform(node).position;
 
-        private void RemoveHighlightFromColumnHead()
-        {
-            // Set the default scale for the column head
-            transform.localScale = Vector3.one * DEFAULT_SCALE;
-            // Set the default material
-            meshRenderer.material = defaultMaterual;
+            if (nodeDisks.Count == 0)
+            {
+                Debug.LogWarning($"No disks available to move for pos: r{node.RowIndex}-c{node.ColumnIndex}");
+                return;
+            }
+            nodeDisks[0].MoveToSlot(targetPosition);
+            nodeDisks.RemoveAt(0);
         }
     }
 }
