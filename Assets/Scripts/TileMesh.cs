@@ -4,20 +4,16 @@ namespace PlotFourVR
 {
     public class TileMesh : MonoBehaviour
     {
-        public TileMeshType TileMeshType => tileMeshType;
         [SerializeField] private TileMeshType tileMeshType;
 
-        private void Awake()
+        public void Initialize(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
         {
-            GetComponentInParent<NodeVisual>().NodePositionSet += OnNodePositionSet;
+            ToggleSelf(verticalAlignment, horizontalAlignment);
+            RotateSelf(verticalAlignment, horizontalAlignment);
         }
 
-        private void OnDestroy()
-        {
-            GetComponentInParent<NodeVisual>().NodePositionSet -= OnNodePositionSet;
-        }
-
-        private void OnNodePositionSet(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
+        // toggles self based on the node position in the grid
+        private void ToggleSelf(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
         {
             // enable/disable the tile mesh based on the node position
             if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
@@ -28,22 +24,26 @@ namespace PlotFourVR
                 // any corner
                 gameObject.SetActive(tileMeshType == TileMeshType.Corner);
             }
-             else if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center) ||
-                    (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Center) ||
-                    (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Left) ||
-                    (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Right))
-             {
+            else if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center) ||
+                   (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Center) ||
+                   (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Left) ||
+                   (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Right))
+            {
                 // any side
                 gameObject.SetActive(tileMeshType == TileMeshType.Side);
-             }
-             else
-             {
+            }
+            else
+            {
                 gameObject.SetActive(tileMeshType == TileMeshType.Center);
-             }
+            }
+        }
 
+        // rotates self based on the node position in the grid
+        private void RotateSelf(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
+        {
             float rotationZ = 0f;
             // rotate the tile mesh based on the node position
-            if((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
+            if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
                 (verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center))
             {
                 rotationZ = -90f;

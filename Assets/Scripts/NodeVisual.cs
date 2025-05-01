@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -8,28 +7,20 @@ namespace PlotFourVR
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class NodeVisual : MonoBehaviour
     {
-        public event Action<VerticalAlignment, HorizontalAlignment> NodePositionSet;
-
         private Node node;
 
-        private MeshRenderer meshRenderer;
-        private ColliderWrapper nodeColliderWrapper;
         private XRSimpleInteractable xRSimpleInteractable;
 
         private RuntimeController runtimeController;
 
-
-        public void Initialize(RuntimeController runtimeController,Node node)
+        public void Initialize(RuntimeController runtimeController,Node node, Vector3 columnHeadPosition)
         {
             this.runtimeController = runtimeController;
 
             this.node = node;
-            node.NodeTypeChanged += OnNodeTypeChanged;
 
-            meshRenderer = GetComponentInChildren<MeshRenderer>();
-
-            nodeColliderWrapper = GetComponentInChildren<ColliderWrapper>();
-            nodeColliderWrapper.ColliderInteracted += OnColliderInteracted;
+            this.runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+            this.runtimeController.GameStateChanged += OnGameStateChanged;
 
             xRSimpleInteractable = GetComponent<XRSimpleInteractable>();
 
@@ -40,128 +31,102 @@ namespace PlotFourVR
             // Toggle child tile mesh renderers based on node position
             TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
 
-            PublishNodePosition();
+            UpdateNodeRotationInChildMeshes();
+        }
+
+        private void OnGameStateChanged(StateType stateType)
+        {
+            // Disable XR interaction when the game is not in a player's turn
+            xRSimpleInteractable.interactionLayers = 0;
+
+            if (stateType == StateType.PlayerOneTurn || stateType == StateType.PlayerTwoTurn)
+            {
+                if (node.NodeType == NodeType.Empty)
+                {
+                    // Enable XR interaction
+                    xRSimpleInteractable.interactionLayers = 1;
+                }
+            }
         }
 
         private void OnDestroy()
         {
-            nodeColliderWrapper.ColliderInteracted -= OnColliderInteracted;
+            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
+            runtimeController.GameStateChanged += OnGameStateChanged;
 
             xRSimpleInteractable.hoverEntered.RemoveListener(OnHoverEntered);
             xRSimpleInteractable.hoverExited.RemoveListener(OnHoverExited);
             xRSimpleInteractable.selectEntered.RemoveListener(OnSelectEntered);
         }
 
+        private void OnNodeTypeChanged(Node node)
+        {
+            if (this.node != node) return;
+
+            //disable xr interaction
+            xRSimpleInteractable.interactionLayers = 0;
+        }
+
         private void OnHoverEntered(HoverEnterEventArgs arg0)
         {
+            // Show the node disk at the column head position
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)
         {
+            // Hide the node disk
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverExited(node);
         }
 
         private void OnSelectEntered(SelectEnterEventArgs arg0)
         {
-            runtimeController   .EventBus.InteractionEvents.InvokeNodeInteracted(node);
-        }
-
-        private void OnColliderInteracted()
-        {
-            // Handle the interaction with the node
             runtimeController.EventBus.InteractionEvents.InvokeNodeInteracted(node);
         }
 
-        private void PublishNodePosition()
+        private void UpdateNodeRotationInChildMeshes()
         {
             VerticalAlignment verticalAlignment = VerticalAlignment.Middle;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
+
+            // Determine the vertical alignment based on the node's position
             if (node.RowIndex == 0)
             {
                 // bottom row
-                if (node.ColumnIndex == 0)
-                {
-                    // bottom left
-                    verticalAlignment = VerticalAlignment.Bottom;
-                    horizontalAlignment = HorizontalAlignment.Left;
-
-                }
-                else if (node.ColumnIndex == runtimeController.ColumnCount - 1)
-                {
-                    // bottom right
-                    verticalAlignment = VerticalAlignment.Bottom;
-                    horizontalAlignment = HorizontalAlignment.Right;
-                }
-                else
-                {
-                    // bottom center
-                    verticalAlignment = VerticalAlignment.Bottom;
-                    horizontalAlignment = HorizontalAlignment.Center;
-                }
+                verticalAlignment = VerticalAlignment.Bottom;
             }
             else if (node.RowIndex == runtimeController.RowCount - 1)
             {
                 // top row
-                if (node.ColumnIndex == 0)
-                {
-                    // top left
-                    verticalAlignment = VerticalAlignment.Top;
-                    horizontalAlignment = HorizontalAlignment.Left;
-                }
-                else if (node.ColumnIndex == runtimeController.ColumnCount - 1)
-                {
-                    // top right
-                    verticalAlignment = VerticalAlignment.Top;
-                    horizontalAlignment = HorizontalAlignment.Right;
-                }
-                else
-                {
-                    // top center
-                    verticalAlignment = VerticalAlignment.Top;
-                    horizontalAlignment = HorizontalAlignment.Center;
-                }
+                verticalAlignment = VerticalAlignment.Top;
             }
             else
             {
                 // middle row
-                if (node.ColumnIndex == 0)
-                {
-                    // middle left
-                    verticalAlignment = VerticalAlignment.Middle;
-                    horizontalAlignment = HorizontalAlignment.Left;
-                }
-                else if (node.ColumnIndex == runtimeController.ColumnCount - 1)
-                {
-                    // middle right
-                    verticalAlignment = VerticalAlignment.Middle;
-                    horizontalAlignment = HorizontalAlignment.Right;
-                }
-                else
-                {
-                    // middle center
-                    verticalAlignment = VerticalAlignment.Middle;
-                    horizontalAlignment = HorizontalAlignment.Center;
-                }
+                verticalAlignment = VerticalAlignment.Middle;
             }
-            NodePositionSet?.Invoke(verticalAlignment, horizontalAlignment);
-        }
 
-        private void OnNodeTypeChanged(NodeType nodeType)
-        {
-            switch (nodeType)
+            // Determine the horizontal alignment based on the node's position
+            if (node.ColumnIndex == 0)
             {
-                case NodeType.Empty:
-                    meshRenderer.material.color = Color.white;
-                    break;
-                case NodeType.Yellow:
-                    meshRenderer.material.color = Color.yellow;
-                    break;
-                case NodeType.Red:
-                    meshRenderer.material.color = Color.red;
-                    break;
-                default:
-                    throw new NotImplementedException($"{nodeType} is not implemented for material updates");
+                // leftmost column
+                horizontalAlignment = HorizontalAlignment.Left;
+            }
+            else if (node.ColumnIndex == runtimeController.ColumnCount - 1)
+            {
+                // rightmost column
+                horizontalAlignment = HorizontalAlignment.Right;
+            }
+            else
+            {
+                // center column
+                horizontalAlignment = HorizontalAlignment.Center;
+            }
+
+            TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
+            foreach (TileMesh tileMesh in tileMeshes)
+            {
+                tileMesh.Initialize(verticalAlignment, horizontalAlignment);
             }
         }
     }
