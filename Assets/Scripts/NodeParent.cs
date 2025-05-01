@@ -30,6 +30,8 @@ namespace PlotFourVR
 
         private RuntimeController runtimeController;
 
+        private bool canPlayTile;
+
         public int PlayedTileCount => playedTileCount; // Number of tiles played by the player  
         private int playedTileCount = 0; // Number of tiles played
         private int totalTileCount = 0; // Total number of tiles in the grid
@@ -86,7 +88,11 @@ namespace PlotFourVR
         private void OnGameStateChanged(StateType stateType)
         {
             currentStateType = stateType;
-            if (stateType == StateType.GameOver)
+            if(stateType is StateType.PlayerOneTurn or StateType.PlayerTwoTurn)
+            {
+            canPlayTile = true;
+            }
+            else if (stateType == StateType.GameOver)
             {
                 // Handle game over state
                 runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
@@ -145,7 +151,8 @@ namespace PlotFourVR
             nodeDictionary = new Dictionary<Vector2Int, NodeType>();
 
             // position parent transform at the center of the grid
-            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing), transform.position.y, transform.position.z);
+            float xOffset = columnCount  * 0.03f;
+            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing) + xOffset, transform.position.y, transform.position.z);
 
             // Initialize the grid of nodes
             for (int row = 0; row < rowCount + 1; row++)
@@ -205,6 +212,9 @@ namespace PlotFourVR
         {
             // Check if game state is not GameStarting or GameOver
             if (currentStateType is StateType.GameStarting or StateType.GameOver) return;
+            if (!canPlayTile) return;
+
+            canPlayTile = false;
 
             // Get the first available node in the column
             Node firstAvailableNode = GetFirstAvailableNodeInColumn(node.ColumnIndex);

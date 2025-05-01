@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PlotFourVR
@@ -80,8 +81,10 @@ namespace PlotFourVR
             SetCurrentState(StateType.Initializing);
         }
 
-        public void SetCurrentState(StateType stateType)
+        public async void SetCurrentState(StateType stateType)
         {
+            await RefreshBeforePublishingNewState();
+
             currentState = stateType;
                 
             if(currentState == StateType.Initializing)
@@ -107,6 +110,12 @@ namespace PlotFourVR
                 nodeParent.Initialize(this);
             }
             GameStateChanged?.Invoke(currentState);
+        }
+
+        public async Task RefreshBeforePublishingNewState()
+        {
+            GameStateChanged?.Invoke(StateType.None);
+            await Task.Delay(500);
         }
     }
 
