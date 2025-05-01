@@ -14,8 +14,15 @@ namespace PlotFourVR
         private ColliderWrapper nodeColliderWrapper;
         private XRSimpleInteractable xRSimpleInteractable;
 
-        private void Awake()
+        private RuntimeController runtimeController;
+
+        public void Initialize(RuntimeController runtimeController,Node node)
         {
+            this.runtimeController = runtimeController;
+
+            this.node = node;
+            node.NodeTypeChanged += OnNodeTypeChanged;
+
             meshRenderer = GetComponentInChildren<MeshRenderer>();
 
             nodeColliderWrapper = GetComponentInChildren<ColliderWrapper>();
@@ -39,30 +46,23 @@ namespace PlotFourVR
 
         private void OnHoverEntered(HoverEnterEventArgs arg0)
         {
-            RuntimeController.Instance.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+            runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)
         {
-            RuntimeController.Instance.EventBus.InteractionEvents.InvokeNodeHoverExited(node);
+            runtimeController.EventBus.InteractionEvents.InvokeNodeHoverExited(node);
         }
 
         private void OnSelectEntered(SelectEnterEventArgs arg0)
         {
-            RuntimeController.Instance.EventBus.InteractionEvents.InvokeNodeInteracted(node);
+            runtimeController   .EventBus.InteractionEvents.InvokeNodeInteracted(node);
         }
 
         private void OnColliderInteracted()
         {
-            print("Collider interacted with node: " + gameObject.name);
             // Handle the interaction with the node
-            RuntimeController.Instance.EventBus.InteractionEvents.InvokeNodeInteracted(node);
-        }
-
-        public void Initialize(Node node)
-        {
-            this.node = node;
-            node.NodeTypeChanged += OnNodeTypeChanged;
+            runtimeController.EventBus.InteractionEvents.InvokeNodeInteracted(node);
         }
 
         private void OnNodeTypeChanged(NodeType nodeType)

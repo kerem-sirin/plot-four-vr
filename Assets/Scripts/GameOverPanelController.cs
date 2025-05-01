@@ -14,11 +14,9 @@ namespace PlotFourVR
         [SerializeField] private TextMeshProUGUI resultText;
         [SerializeField] private TextMeshProUGUI tilesPlayedText;
         [SerializeField] private TextMeshProUGUI playTimeText;
-        [SerializeField] private NodeParent nodeParent;
 
-        protected override void Awake()
+        protected override void Initialize()
         {
-            base.Awake();
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
         }
@@ -57,8 +55,9 @@ namespace PlotFourVR
             {
                 resultText.SetText("It's a Draw!");
             }
-            tilesPlayedText.SetText(nodeParent.PlayedTileCount.ToString());
-            playTimeText.SetText(FormatTime(nodeParent.PlayTime));
+
+            tilesPlayedText.SetText(runtimeController.NodeParent.PlayedTileCount.ToString());
+            playTimeText.SetText(FormatTime(runtimeController.NodeParent.PlayTime));
         }
 
         private string FormatTime(float playtime)

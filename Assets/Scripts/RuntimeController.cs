@@ -19,6 +19,13 @@ namespace PlotFourVR
         public StateType CurrentState => currentState;
         [SerializeField] private StateType currentState;
 
+        [SerializeField] private Transform nodeParentTransform;
+        public NodeParent NodeParent => nodeParent;
+        private NodeParent nodeParent;
+
+        [SerializeField] private Transform uiMainTransform;
+        private UiMainController uiMainController;
+
         public EventBus EventBus { get; private set; }
         public int RowCount { get; private set; }
         public int ColumnCount { get; private set; }
@@ -70,13 +77,35 @@ namespace PlotFourVR
 
         private void Start()
         {
-            // Set initial menu
-            EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+            SetCurrentState(StateType.Initializing);
         }
 
         public void SetCurrentState(StateType stateType)
         {
             currentState = stateType;
+                
+            if(currentState == StateType.Initializing)
+            {
+                // instantiate uiMainTransform
+                if (uiMainController != null)
+                {
+                    Destroy(uiMainController.gameObject);
+                }
+                uiMainController = Instantiate(uiMainTransform).GetComponent<UiMainController>();
+                uiMainController.Initialize(this);
+            }
+
+            if (currentState == StateType.GameStarting)
+            {
+                if (nodeParent != null)
+                {
+                    Destroy(nodeParent.gameObject);
+                }
+
+                // instantiate nodeParentTransform
+                nodeParent = Instantiate(nodeParentTransform).GetComponent<NodeParent>();
+                nodeParent.Initialize(this);
+            }
             GameStateChanged?.Invoke(currentState);
         }
     }
@@ -88,6 +117,7 @@ namespace PlotFourVR
         PlayerOneTurn,
         PlayerTwoTurn,
         GameOver,
+        Initializing,
     }
 
     public enum ResultType

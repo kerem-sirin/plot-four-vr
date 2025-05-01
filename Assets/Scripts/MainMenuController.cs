@@ -17,10 +17,8 @@ namespace PlotFourVR
         [SerializeField] private TextMeshProUGUI heightInfoText;
         [SerializeField] private TextMeshProUGUI winLengthInfoText;
 
-        protected override void Awake()
+        protected override void Initialize()
         {
-            base.Awake();
-
             playButton.onClick.AddListener(OnPlayButtonClicked);
             settingsButton.onClick.AddListener(OnSettingsButtonClicked);
 

@@ -12,9 +12,8 @@ namespace PlotFourVR
         [SerializeField] private SliderBehaviour heightSlider;
         [SerializeField] private SliderBehaviour winLengthSlider;
 
-        protected override void Awake()
+        protected override void Initialize()
         {
-            base.Awake();
 
             acceptButton.onClick.AddListener(OnAcceptButtonClicked);
             resetToDefaultValuesButton.onClick.AddListener(OnResetToDefaultValuesButtonClicked);

@@ -9,15 +9,22 @@ namespace PlotFourVR
         [SerializeField] private PanelType menuType;
         [SerializeField] protected GameObject parent;
 
-        private PanelType initialMenuType = PanelType.MainMenu;
         protected CanvasGroup parentCanvasGroup;  
 
-        protected virtual void Awake()
+        protected RuntimeController runtimeController;
+
+        internal virtual void Initialize(RuntimeController runtimeController, PanelType initialMenuType)
         {
+            this.runtimeController = runtimeController;
+
             RuntimeController.Instance.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
             parentCanvasGroup = parent.GetComponent<CanvasGroup>();
             parent.SetActive(menuType == initialMenuType);
+
+            Initialize();
         }
+
+        protected abstract void Initialize();
 
         protected virtual void OnDestroy()
         {

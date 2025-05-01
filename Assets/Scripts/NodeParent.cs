@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,13 +21,14 @@ namespace PlotFourVR
         private Dictionary<Vector2Int, NodeType> nodeDictionary = new();
         private Dictionary<int, Transform> columnHeads = new();
 
-        private InputAction pauseAction;
         private InputAction uiClickAction;
         private InputAction mousePositionAction;
 
         private PlayerInput playerInput;
 
         private StateType currentStateType;
+
+        private RuntimeController runtimeController;
 
         public int PlayedTileCount => playedTileCount; // Number of tiles played by the player  
         private int playedTileCount = 0; // Number of tiles played
@@ -44,18 +44,24 @@ namespace PlotFourVR
             (1, -1)
         };
 
-        private void Awake()
+        public void Initialize(RuntimeController runtimeController)
         {
             playerInput = GetComponent<PlayerInput>();
 
             uiClickAction = playerInput.actions["Click"];
             mousePositionAction = playerInput.actions["Point"];
 
-            RuntimeController.Instance.GameStateChanged += OnGameStateChanged;
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
+            this.runtimeController = runtimeController;
+
+            // Subscribe to events
+            runtimeController.GameStateChanged += OnGameStateChanged;
+            runtimeController.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
 
             uiClickAction.performed += OnUiClickActionPerformed;
             mousePositionAction.performed += OnMousePositionActionPerformed;
+
+            // Draw the grid
+            DrawGrid();
         }
 
         private void Update()
@@ -70,8 +76,8 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            RuntimeController.Instance.GameStateChanged -= OnGameStateChanged;
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
+            runtimeController.GameStateChanged -= OnGameStateChanged;
+            runtimeController.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
 
             uiClickAction.performed -= OnUiClickActionPerformed;
             mousePositionAction.performed -= OnMousePositionActionPerformed;
@@ -80,15 +86,10 @@ namespace PlotFourVR
         private void OnGameStateChanged(StateType stateType)
         {
             currentStateType = stateType;
-            if (stateType == StateType.GameStarting)
-            {
-                // Draw the grid of nodes
-                DrawGrid();
-            }
-            else if (stateType == StateType.GameOver)
+            if (stateType == StateType.GameOver)
             {
                 // Handle game over state
-                RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
+                runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
             }
         }
 
@@ -119,10 +120,10 @@ namespace PlotFourVR
 
         private void DrawGrid()
         {
-            rowCount = RuntimeController.Instance.RowCount;
-            columnCount = RuntimeController.Instance.ColumnCount;
-            winLength = RuntimeController.Instance.WinLength;
-            RuntimeController.Instance.GameResult = ResultType.None;
+            rowCount = runtimeController.RowCount;
+            columnCount = runtimeController.ColumnCount;
+            winLength = runtimeController.WinLength;
+            runtimeController.GameResult = ResultType.None;
 
             nodeDictionary.Clear();
             nodes.Clear();
@@ -170,10 +171,10 @@ namespace PlotFourVR
                         nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
 
                         // Add the Node component to the node
-                        NodeVisual nodeComponent = nodeTransform.GetComponent<NodeVisual>();
+                        NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
 
                         // Initialize the node with its row and column index
-                        nodeComponent.Initialize(node);
+                        nodeVisual.Initialize(runtimeController, node);
                     }
                     // Create a column head on top of each column
                     else if (row == rowCount)
@@ -189,7 +190,7 @@ namespace PlotFourVR
 
                         // Pass the column index to the column head component
                         ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
-                        columnHeadComponent.Initialize(column);
+                        columnHeadComponent.Initialize(runtimeController, column);
 
                         // Add the column head to the dictionary
                         columnHeads.Add(column, columnHeadTransform);
@@ -197,7 +198,7 @@ namespace PlotFourVR
                 }
             }
 
-            RuntimeController.Instance.SetCurrentState(StateType.PlayerOneTurn);
+            runtimeController.SetCurrentState(StateType.PlayerOneTurn);
         }
 
         private void OnNodeInteracted(Node node)
@@ -212,11 +213,11 @@ namespace PlotFourVR
             // Set the node type to the active player's node type
             if (currentStateType == StateType.PlayerOneTurn)
             {
-                firstAvailableNode.NodeType = RuntimeController.Instance.PlayerOneNodeType;
+                firstAvailableNode.NodeType = runtimeController.PlayerOneNodeType;
             }
             else if (currentStateType == StateType.PlayerTwoTurn)
             {
-                firstAvailableNode.NodeType = RuntimeController.Instance.PlayerTwoNodeType;
+                firstAvailableNode.NodeType = runtimeController.PlayerTwoNodeType;
             }
             playedTileCount++;
             // check if it is the winning move
@@ -224,30 +225,30 @@ namespace PlotFourVR
             {
                 if (currentStateType == StateType.PlayerOneTurn)
                 {
-                    RuntimeController.Instance.GameResult = ResultType.PlayerOneWin;
+                    runtimeController.GameResult = ResultType.PlayerOneWin;
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
-                    RuntimeController.Instance.GameResult = ResultType.PlayerTwoWin;
+                    runtimeController.GameResult = ResultType.PlayerTwoWin;
                 }
-                RuntimeController.Instance.SetCurrentState(StateType.GameOver);
+                runtimeController.SetCurrentState(StateType.GameOver);
             }
             // Check if the game is a draw
             else if (playedTileCount >= totalTileCount)
             {
-                RuntimeController.Instance.GameResult = ResultType.Draw;
-                RuntimeController.Instance.SetCurrentState(StateType.GameOver);
+                runtimeController.GameResult = ResultType.Draw;
+                runtimeController.SetCurrentState(StateType.GameOver);
             }
             else
             {
                 // Switch to the other player's turn
                 if (currentStateType == StateType.PlayerOneTurn)
                 {
-                    RuntimeController.Instance.SetCurrentState(StateType.PlayerTwoTurn);
+                    runtimeController.SetCurrentState(StateType.PlayerTwoTurn);
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
-                    RuntimeController.Instance.SetCurrentState(StateType.PlayerOneTurn);
+                    runtimeController.SetCurrentState(StateType.PlayerOneTurn);
                 }
             }
         }

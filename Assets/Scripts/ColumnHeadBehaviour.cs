@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace PlotFourVR
@@ -14,13 +13,17 @@ namespace PlotFourVR
 
         private int columnIndex; // The index of the column this head belongs to
         private MeshRenderer meshRenderer;
+        private RuntimeController runtimeController;
 
-        private void Awake()
+        public void Initialize(RuntimeController runtimeController, int columnIndex)
         {
+            this.runtimeController = runtimeController;
+            this.columnIndex = columnIndex;
+
             meshRenderer = GetComponentInChildren<MeshRenderer>();
 
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
+            runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
+            runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
 
             // Apply default visual properties
             RemoveHighlightFromColumnHead();
@@ -28,8 +31,8 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
-            RuntimeController.Instance.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
+            runtimeController.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
+            runtimeController.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
         }
 
         private void OnNodeHoverEntered(Node node)
@@ -53,17 +56,17 @@ namespace PlotFourVR
         private void HighlightColumnHead()
         {
             // if the current state is not of the player turns, do not highlight
-            if (RuntimeController.Instance.CurrentState != StateType.PlayerOneTurn &&
-                RuntimeController.Instance.CurrentState != StateType.PlayerTwoTurn) return;
+            if (runtimeController.CurrentState != StateType.PlayerOneTurn &&
+                runtimeController.CurrentState != StateType.PlayerTwoTurn) return;
             
             transform.localScale = Vector3.one * HIGHLIGHT_SCALE; // Example scaling for highlight effect
 
             // Set the highlight material depending on the player turn
-            if (RuntimeController.Instance.CurrentState == StateType.PlayerOneTurn)
+            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
             {
                 meshRenderer.material = yellowHighlightMaterial;
             }
-            else if (RuntimeController.Instance.CurrentState == StateType.PlayerTwoTurn)
+            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
             {
                 meshRenderer.material = redHighlightMaterial;
             }
@@ -75,11 +78,6 @@ namespace PlotFourVR
             transform.localScale = Vector3.one * DEFAULT_SCALE;
             // Set the default material
             meshRenderer.material = defaultMaterual;
-        }
-
-        public void Initialize(int columnIndex)
-        {
-            this.columnIndex = columnIndex;
         }
     }
 }

@@ -7,9 +7,8 @@ namespace PlotFourVR
         [Header("Turn Panel Properties")]
         [SerializeField] private StateType activeState;
 
-        protected override void Awake()
+        protected override void Initialize()
         {
-            base.Awake();
             RuntimeController.Instance.GameStateChanged += OnGameStateChanged;
         }
 
