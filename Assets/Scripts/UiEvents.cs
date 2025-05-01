@@ -4,18 +4,19 @@ namespace PlotFourVR
 {
     public class UiEvents
     {
-        public event Action<MenuType> MenuPanelRequested;
-        public void RequestMenuPanel(MenuType menuType)
+        public event Action<PanelType> MenuPanelRequested;
+        public void RequestMenuPanel(PanelType menuType)
         {
             MenuPanelRequested?.Invoke(menuType);
         }
     }
     
-    public enum MenuType
+    public enum PanelType
     {
         MainMenu,
         SettingsMenu,
-        GameOverMenu
+        YellowTurnMenu,
+        RedTurnMenu,
+        GameOverMenu,
     }
-
 }

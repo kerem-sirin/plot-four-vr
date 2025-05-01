@@ -57,7 +57,7 @@ namespace PlotFourVR
         private void OnSettingsButtonClicked()
         {
             // Handle settings button click
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(MenuType.SettingsMenu);
+            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
         }
 
         private void OnGridWidthChanged(int obj)

@@ -53,7 +53,7 @@ namespace PlotFourVR
 
         private void OnAcceptButtonClicked()
         {
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(MenuType.MainMenu);
+            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
             PanelDisabled();
         }
 

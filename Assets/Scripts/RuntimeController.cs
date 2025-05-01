@@ -71,33 +71,12 @@ namespace PlotFourVR
         private void Start()
         {
             // Set initial menu
-            EventBus.UiEvents.RequestMenuPanel(MenuType.MainMenu);
+            EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
         }
 
         public void SetCurrentState(StateType stateType)
         {
             currentState = stateType;
-            /*
-            switch (stateType)
-            {
-                case StateType.GameStarting:
-                    currentState = StateType.PlayerOneTurn;
-                    // Initialize game state
-                    break;
-                case StateType.PlayerOneTurn:
-
-                    // Handle player one's turn
-                    break;
-                case StateType.PlayerTwoTurn:
-                    // Handle player two's turn
-                    break;
-                case StateType.GameOver:
-                    // Handle game over state
-                    break;
-                default:
-                    throw new NotImplementedException($"{currentState} is not implemented for game state");
-            }
-            */
             GameStateChanged?.Invoke(currentState);
         }
     }

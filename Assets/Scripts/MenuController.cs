@@ -6,10 +6,10 @@ namespace PlotFourVR
     public abstract class MenuController : MonoBehaviour
     {
         [Header("Base Menu Properties")]
-        [SerializeField] private MenuType menuType;
+        [SerializeField] private PanelType menuType;
         [SerializeField] protected GameObject parent;
 
-        private MenuType initialMenuType = MenuType.MainMenu;
+        private PanelType initialMenuType = PanelType.MainMenu;
         protected CanvasGroup parentCanvasGroup;  
 
         protected virtual void Awake()
@@ -24,7 +24,7 @@ namespace PlotFourVR
             RuntimeController.Instance.EventBus.UiEvents.MenuPanelRequested -= OnMenuPanelRequested;
         }
 
-        private void OnMenuPanelRequested(MenuType requestedMenuType)
+        private void OnMenuPanelRequested(PanelType requestedMenuType)
         {
             if (requestedMenuType == menuType)
             {

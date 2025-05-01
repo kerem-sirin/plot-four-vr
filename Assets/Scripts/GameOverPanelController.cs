@@ -32,7 +32,7 @@ namespace PlotFourVR
 
         private void OnMainMenuButtonClicked()
         {
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(MenuType.MainMenu);
+            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
         }
 
         private void OnPlayAgainButtonClicked()

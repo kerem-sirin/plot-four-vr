@@ -88,7 +88,7 @@ namespace PlotFourVR
             else if (stateType == StateType.GameOver)
             {
                 // Handle game over state
-                RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(MenuType.GameOverMenu);
+                RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
             }
         }
 
