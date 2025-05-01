@@ -16,6 +16,7 @@ namespace PlotFourVR
         public NodeType PlayerOneNodeType => NodeType.Yellow;
         public NodeType PlayerTwoNodeType => NodeType.Red;
 
+        public StateType CurrentState => currentState;
         [SerializeField] private StateType currentState;
 
         public EventBus EventBus { get; private set; }

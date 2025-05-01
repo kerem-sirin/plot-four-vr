@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,7 @@ namespace PlotFourVR
     {
         [SerializeField] private Transform nodePrefab;
         [SerializeField] private float nodeSpacing; // Space between nodes
+        [SerializeField] private Transform columnHead;
 
         private int rowCount;
         private int columnCount;
@@ -18,6 +20,7 @@ namespace PlotFourVR
 
         private List<Node> nodes = new();
         private Dictionary<Vector2Int, NodeType> nodeDictionary = new();
+        private Dictionary<int, Transform> columnHeads = new();
 
         private InputAction pauseAction;
         private InputAction uiClickAction;
@@ -49,6 +52,7 @@ namespace PlotFourVR
             mousePositionAction = playerInput.actions["Point"];
 
             RuntimeController.Instance.GameStateChanged += OnGameStateChanged;
+            RuntimeController.Instance.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
 
             uiClickAction.performed += OnUiClickActionPerformed;
             mousePositionAction.performed += OnMousePositionActionPerformed;
@@ -67,6 +71,7 @@ namespace PlotFourVR
         private void OnDestroy()
         {
             RuntimeController.Instance.GameStateChanged -= OnGameStateChanged;
+            RuntimeController.Instance.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
 
             uiClickAction.performed -= OnUiClickActionPerformed;
             mousePositionAction.performed -= OnMousePositionActionPerformed;
@@ -103,7 +108,7 @@ namespace PlotFourVR
             if (Physics.Raycast(ray, out hit))
             {
                 // Check if the raycast hit a node
-                NodeColliderWrapper nodeColliderWrapper = hit.collider.GetComponent<NodeColliderWrapper>();
+                ColliderWrapper nodeColliderWrapper = hit.collider.GetComponent<ColliderWrapper>();
                 if (nodeColliderWrapper != null)
                 {
                     // Handle the interaction with the node
@@ -121,6 +126,7 @@ namespace PlotFourVR
 
             nodeDictionary.Clear();
             nodes.Clear();
+            columnHeads.Clear();
             // Clear existing nodes
             foreach (Transform child in transform)
             {
@@ -141,32 +147,53 @@ namespace PlotFourVR
             transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing), transform.position.y, transform.position.z);
 
             // Initialize the grid of nodes
-            for (int row = 0; row < rowCount; row++)
+            for (int row = 0; row < rowCount + 1; row++)
             {
                 for (int column = 0; column < columnCount; column++)
                 {
-                    Node node = new Node(row, column, NodeType.Empty);
-                    nodes.Add(node);
+                    // Create a new node each rowCount
+                    if (row < rowCount)
+                    {
+                        Node node = new Node(row, column, NodeType.Empty);
+                        nodes.Add(node);
 
-                    node.NodeInteracted += OnNodeInteracted;
+                        // Add the node to the dictionary
+                        nodeDictionary.Add(new Vector2Int(row, column), NodeType.Empty);
 
-                    // Add the node to the dictionary
-                    nodeDictionary.Add(new Vector2Int(row, column), NodeType.Empty);
+                        // Instantiate the node prefab
+                        Transform nodeTransform = Instantiate(nodePrefab, new Vector3(column, 0, row), Quaternion.identity, transform);
 
-                    // Instantiate the node prefab
-                    Transform nodeTransform = Instantiate(nodePrefab, new Vector3(column, 0, row), Quaternion.identity, transform);
+                        // Name node game object according to its position
+                        nodeTransform.name = $"Node_{row}_{column}";
 
-                    // Name node game object according to its position
-                    nodeTransform.name = $"Node_{row}_{column}";
+                        // Set the position of the node
+                        nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
 
-                    // Set the position of the node
-                    nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
+                        // Add the Node component to the node
+                        NodeVisual nodeComponent = nodeTransform.GetComponent<NodeVisual>();
 
-                    // Add the Node component to the node
-                    NodeVisual nodeComponent = nodeTransform.GetComponent<NodeVisual>();
+                        // Initialize the node with its row and column index
+                        nodeComponent.Initialize(node);
+                    }
+                    // Create a column head on top of each column
+                    else if (row == rowCount)
+                    {
+                        // Instantiate the column head prefab
+                        Transform columnHeadTransform = Instantiate(columnHead, new Vector3(column, 0, row), Quaternion.identity, transform);
 
-                    // Initialize the node with its row and column index
-                    nodeComponent.Initialize(node);
+                        // Name column head game object according to its position
+                        columnHeadTransform.name = $"ColumnHead_{column}";
+
+                        // Set the position of the column head
+                        columnHeadTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
+
+                        // Pass the column index to the column head component
+                        ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
+                        columnHeadComponent.Initialize(column);
+
+                        // Add the column head to the dictionary
+                        columnHeads.Add(column, columnHeadTransform);
+                    }
                 }
             }
 
@@ -303,7 +330,6 @@ namespace PlotFourVR
     [Serializable]
     public class Node
     {
-        public event Action<Node> NodeInteracted;
         public event Action<NodeType> NodeTypeChanged;
 
         public Node(int rowIndex, int columnIndex, NodeType nodeType)
@@ -326,11 +352,5 @@ namespace PlotFourVR
                 }
         }
         [SerializeField] private NodeType nodeType;
-
-
-        public void Interact()
-        {
-            NodeInteracted?.Invoke(this);
-        }
     }
 }

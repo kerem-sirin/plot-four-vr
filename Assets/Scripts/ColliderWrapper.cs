@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace PlotFourVR
 {
-    public class NodeColliderWrapper : MonoBehaviour
+    /// <summary>
+    /// Wrapper class for the collider to handle mouse interactions.
+    /// </summary>
+    public class ColliderWrapper : MonoBehaviour
     {
         public event Action ColliderInteracted;
 
