@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e45e07250305e3543a59bf9272af1396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diskTransform: {fileID: 5192744911389978327, guid: 028700c6640c44f42b1b76a1d8c4e9a1, type: 3}
+  diskPrefab: {fileID: 5192744911389978327, guid: 028700c6640c44f42b1b76a1d8c4e9a1, type: 3}
   redHighlightMaterial: {fileID: 2100000, guid: 99623a1a72cd279409c41d2a94cd960d, type: 2}
   yellowHighlightMaterial: {fileID: 2100000, guid: 43ac0965ee854924480843cd90b1a765, type: 2}

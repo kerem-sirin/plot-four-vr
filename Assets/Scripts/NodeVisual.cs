@@ -52,7 +52,7 @@ namespace PlotFourVR
         private void OnDestroy()
         {
             runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
-            runtimeController.GameStateChanged += OnGameStateChanged;
+            runtimeController.GameStateChanged -= OnGameStateChanged;
 
             xRSimpleInteractable.hoverEntered.RemoveListener(OnHoverEntered);
             xRSimpleInteractable.hoverExited.RemoveListener(OnHoverExited);
