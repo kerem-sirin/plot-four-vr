@@ -30,13 +30,12 @@ namespace PlotFourVR
 
         private void OnMainMenuButtonClicked()
         {
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+            RuntimeController.Instance.SetCurrentState(StateType.EndingCurrentGame);
         }
 
         private void OnPlayAgainButtonClicked()
         {
             RuntimeController.Instance.SetCurrentState(StateType.GameStarting);
-            PanelDisabled();
         }
 
         protected override void PanelEnabled()

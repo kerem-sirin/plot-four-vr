@@ -6,9 +6,9 @@ namespace PlotFourVR
 {
     public class RuntimeController : MonoBehaviour
     {
-        public const int DefaultGridWidth = 9;
-        public const int DefaultGridHeight = 7;
-        public const int DefaultWinLength = 4;
+        public const int DEFAULT_GRID_WIDTH = 9;
+        public const int DEFAULT_GRID_HEIGHT = 7;
+        public const int DEFAULT_WIN_LENGHT = 4;
 
         public static RuntimeController Instance { get; private set; }
 
@@ -53,9 +53,9 @@ namespace PlotFourVR
             EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
 
             // Set default values
-            RowCount = DefaultGridHeight;
-            ColumnCount = DefaultGridWidth;
-            WinLength = DefaultWinLength;
+            RowCount = DEFAULT_GRID_HEIGHT;
+            ColumnCount = DEFAULT_GRID_WIDTH;
+            WinLength = DEFAULT_WIN_LENGHT;
         }
 
         private void OnWinLengthChanged(int newValue)
@@ -96,24 +96,41 @@ namespace PlotFourVR
                 }
                 uiMainController = Instantiate(uiMainTransform).GetComponent<UiMainController>();
                 uiMainController.Initialize(this);
+                SetCurrentState(StateType.Idle);
+            }
+
+            if (currentState == StateType.Idle)
+            {
+                EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
             }
 
             if (currentState == StateType.GameStarting)
             {
                 if (nodeParent != null)
                 {
-                    Destroy(nodeParent.gameObject);
+                    nodeParent.Destroy();
                 }
 
                 // instantiate nodeParentTransform
                 nodeParent = Instantiate(nodeParentTransform).GetComponent<NodeParent>();
                 nodeParent.Initialize(this);
             }
+
+            if (currentState == StateType.EndingCurrentGame)
+            {
+                if (nodeParent != null)
+                {
+                    nodeParent.Destroy();
+                    SetCurrentState(StateType.Idle);
+
+                }
+            }
             GameStateChanged?.Invoke(currentState);
         }
 
         public async Task RefreshBeforePublishingNewState()
         {
+            EventBus.UiEvents.RequestMenuPanel(PanelType.None);
             GameStateChanged?.Invoke(StateType.None);
             await Task.Delay(500);
         }
@@ -126,7 +143,9 @@ namespace PlotFourVR
         PlayerOneTurn,
         PlayerTwoTurn,
         GameOver,
+        EndingCurrentGame,
         Initializing,
+        Idle,
     }
 
     public enum ResultType

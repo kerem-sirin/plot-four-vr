@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using DG.Tweening;
 
 namespace PlotFourVR
 {
@@ -55,7 +55,8 @@ namespace PlotFourVR
         private void Update()
         {
             // Check if one of the players is playing
-            if (currentStateType == StateType.PlayerOneTurn || currentStateType == StateType.PlayerTwoTurn)
+            if (currentStateType == StateType.PlayerOneTurn || currentStateType == StateType.PlayerTwoTurn
+                || currentStateType == StateType.None)
             {
                 // Update play time
                 playTime += Time.deltaTime;
@@ -73,7 +74,7 @@ namespace PlotFourVR
             currentStateType = stateType;
             if(stateType is StateType.PlayerOneTurn or StateType.PlayerTwoTurn)
             {
-            canPlayTile = true;
+                canPlayTile = true;
             }
             else if (stateType == StateType.GameOver)
             {
@@ -126,7 +127,6 @@ namespace PlotFourVR
 
                 // Add the column head to the dictionary
                 columnHeads.Add(column, columnHeadTransform);
-
             }
 
             // Initialize the grid of nodes
@@ -154,7 +154,11 @@ namespace PlotFourVR
                 }
             }
 
-            runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+            transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
+            {
+                // Set the node parent transform to the center of the grid
+                runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+            });
         }
 
         private void OnNodeInteracted(Node node)
@@ -299,6 +303,14 @@ namespace PlotFourVR
             }
             Debug.LogWarning($"Node transform for {node} not found.");
             return null;
+        }
+
+        internal void Destroy()
+        {
+            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InOutCirc).OnComplete(() =>
+            {
+                Destroy(gameObject);
+            });
         }
     }
 
