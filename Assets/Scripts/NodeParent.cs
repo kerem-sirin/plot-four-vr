@@ -7,8 +7,9 @@ namespace PlotFourVR
 {
     public class NodeParent : MonoBehaviour
     {
+        private const float NODE_SPACING = 0.2f; // Space between nodes
+
         [SerializeField] private Transform nodePrefab;
-        [SerializeField] private float nodeSpacing; // Space between nodes
         [SerializeField] private Transform columnHead;
 
         private int rowCount;
@@ -106,8 +107,7 @@ namespace PlotFourVR
             playedTileCount = 0;
 
             // position parent transform at the center of the grid
-            float xOffset = columnCount  * 0.03f;
-            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * nodeSpacing) + xOffset, transform.position.y, transform.position.z);
+            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * NODE_SPACING), transform.position.y, transform.position.z);
 
             // Initialize the column heads
             for (int column = 0; column < columnCount; column++)
@@ -119,7 +119,7 @@ namespace PlotFourVR
                 columnHeadTransform.name = $"ColumnHead_{column}";
 
                 // Set the position of the column head
-                columnHeadTransform.localPosition = new Vector3(column * nodeSpacing, rowCount * nodeSpacing, 0f);
+                columnHeadTransform.localPosition = new Vector3(column * NODE_SPACING, rowCount * NODE_SPACING, 0f);
 
                 // Pass the column index to the column head component
                 ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
@@ -144,7 +144,7 @@ namespace PlotFourVR
                     nodeTransform.name = $"Node_{row}_{column}";
 
                     // Set the position of the node
-                    nodeTransform.localPosition = new Vector3(column * nodeSpacing, row * nodeSpacing, 0f);
+                    nodeTransform.localPosition = new Vector3(column * NODE_SPACING, row * NODE_SPACING, 0f);
 
                     // Add the Node component to the node
                     NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
@@ -158,6 +158,11 @@ namespace PlotFourVR
             {
                 // Set the node parent transform to the center of the grid
                 runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+
+                // get the top left node, broadcast the position for menu repositioning
+                Node topLeftNode = GetNode(0, 0);
+                Vector3 topLeftNodePostion = GetNodeTransform(topLeftNode).position;
+                runtimeController.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
             });
         }
 
