@@ -8,7 +8,7 @@ namespace PlotFourVR
     {
         public const int DEFAULT_GRID_WIDTH = 9;
         public const int DEFAULT_GRID_HEIGHT = 7;
-        public const int DEFAULT_WIN_LENGHT = 4;
+        public const int DEFAULT_WIN_LENGTH = 4;
 
         public static RuntimeController Instance { get; private set; }
 
@@ -55,7 +55,7 @@ namespace PlotFourVR
             // Set default values
             RowCount = DEFAULT_GRID_HEIGHT;
             ColumnCount = DEFAULT_GRID_WIDTH;
-            WinLength = DEFAULT_WIN_LENGHT;
+            WinLength = DEFAULT_WIN_LENGTH;
         }
 
         private void OnWinLengthChanged(int newValue)
