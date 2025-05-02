@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace PlotFourVR
 {
@@ -9,6 +10,12 @@ namespace PlotFourVR
         {
             MenuPanelRequested?.Invoke(menuType);
         }
+
+        public event Action<Vector3> RepositionGridRelatedMenuPositioningRequested;
+        public void RequestRepositionGridRelatedMenuPositioning(Vector3 newPosition)
+        {
+            RepositionGridRelatedMenuPositioningRequested?.Invoke(newPosition);
+        }
     }
     
     public enum PanelType
@@ -18,5 +25,6 @@ namespace PlotFourVR
         YellowTurnMenu,
         RedTurnMenu,
         GameOverMenu,
+        None
     }
 }

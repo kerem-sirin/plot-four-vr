@@ -19,6 +19,15 @@ namespace PlotFourVR
         {
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
+
+            RuntimeController.Instance.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+        }
+
+        private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
+        {
+            Vector3 offset = new Vector3(-0.55f, 0.75f, 0f);
+            transform.position = vector;
+            transform.localPosition += offset;
         }
 
         protected override void OnDestroy()
@@ -26,17 +35,18 @@ namespace PlotFourVR
             base.OnDestroy();
             playAgainButton.onClick.RemoveListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
+
+            RuntimeController.Instance.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnMainMenuButtonClicked()
         {
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+            RuntimeController.Instance.SetCurrentState(StateType.EndingCurrentGame);
         }
 
         private void OnPlayAgainButtonClicked()
         {
             RuntimeController.Instance.SetCurrentState(StateType.GameStarting);
-            PanelDisabled();
         }
 
         protected override void PanelEnabled()

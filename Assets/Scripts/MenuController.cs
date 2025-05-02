@@ -13,13 +13,12 @@ namespace PlotFourVR
 
         protected RuntimeController runtimeController;
 
-        internal virtual void Initialize(RuntimeController runtimeController, PanelType initialMenuType)
+        internal virtual void Initialize(RuntimeController runtimeController)
         {
             this.runtimeController = runtimeController;
 
             RuntimeController.Instance.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
             parentCanvasGroup = parent.GetComponent<CanvasGroup>();
-            parent.SetActive(menuType == initialMenuType);
 
             Initialize();
         }

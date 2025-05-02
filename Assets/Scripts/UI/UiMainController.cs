@@ -4,7 +4,6 @@ namespace PlotFourVR
 {
     public class UiMainController : MonoBehaviour
     {
-        private const PanelType INITIAL_PANEL_TYPE = PanelType.MainMenu;
         [SerializeField] private MenuController[] menuPanels;
         public void Initialize(RuntimeController runtimeController)
         {
@@ -13,7 +12,7 @@ namespace PlotFourVR
 
             foreach (var panel in menuPanels)
             {
-                panel.Initialize(runtimeController, INITIAL_PANEL_TYPE);
+                panel.Initialize(runtimeController);
             }
         }
     }
