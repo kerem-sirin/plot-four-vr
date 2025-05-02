@@ -10,15 +10,14 @@ namespace PlotFourVR
         public const int DEFAULT_GRID_HEIGHT = 7;
         public const int DEFAULT_WIN_LENGTH = 4;
 
-        public static RuntimeController Instance { get; private set; }
-
         public event Action<StateType> GameStateChanged;
+
         // Player NodeTypes
         public NodeType PlayerOneNodeType => NodeType.Yellow;
         public NodeType PlayerTwoNodeType => NodeType.Red;
 
         public StateType CurrentState => currentState;
-        [SerializeField] private StateType currentState;
+        private StateType currentState;
 
         [SerializeField] private Transform nodeParentTransform;
         public NodeParent NodeParent => nodeParent;
@@ -36,16 +35,6 @@ namespace PlotFourVR
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-
             EventBus = new EventBus();
 
             EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
@@ -132,7 +121,7 @@ namespace PlotFourVR
         {
             EventBus.UiEvents.RequestMenuPanel(PanelType.None);
             GameStateChanged?.Invoke(StateType.None);
-            await Task.Delay(500);
+            await Task.Delay(600);
         }
     }
 

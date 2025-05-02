@@ -23,14 +23,14 @@ namespace PlotFourVR
             settingsButton.onClick.AddListener(OnSettingsButtonClicked);
 
             // subscribe to events to update the UI
-            RuntimeController.Instance.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+            runtimeController.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
+            runtimeController.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
+            runtimeController.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
 
             // Set the initial values for the UI elements
-            widthInfoText.SetText(RuntimeController.Instance.ColumnCount.ToString());
-            heightInfoText.SetText($"x {RuntimeController.Instance.RowCount.ToString()}");
-            winLengthInfoText.SetText($"{RuntimeController.Instance.WinLength.ToString()} Tiles");
+            widthInfoText.SetText(runtimeController.ColumnCount.ToString());
+            heightInfoText.SetText($"x {runtimeController.RowCount.ToString()}");
+            winLengthInfoText.SetText($"{runtimeController.WinLength.ToString()} Tiles");
         }
 
         protected override void OnDestroy()
@@ -40,22 +40,22 @@ namespace PlotFourVR
             settingsButton.onClick.RemoveListener(OnSettingsButtonClicked);
 
             // unsubscribe from events
-            RuntimeController.Instance.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
+            runtimeController.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
+            runtimeController.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
+            runtimeController.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
         }
 
         private void OnPlayButtonClicked()
         {
             // Handle play button click
-            RuntimeController.Instance.SetCurrentState(StateType.GameStarting);
+            runtimeController.SetCurrentState(StateType.GameStarting);
             PanelDisabled();
         }
 
         private void OnSettingsButtonClicked()
         {
             // Handle settings button click
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
+            runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
         }
 
         private void OnGridWidthChanged(int obj)

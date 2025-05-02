@@ -48,28 +48,13 @@ namespace PlotFourVR
         {
             if (node.ColumnIndex != columnIndex) return;
 
-            // Highlight the column head
-            // if the current state is not of the player turns, do not highlight
-            if (runtimeController.CurrentState != StateType.PlayerOneTurn &&
-                runtimeController.CurrentState != StateType.PlayerTwoTurn) return;
-
             // get the first disk from the queue
             if (nodeDisks.Count == 0)
             {
                 Debug.LogWarning($"No disks available to highlight for pos: r{node.RowIndex}-c{node.ColumnIndex}");
                 return;
             }
-            nodeDisks[0].Show();
-
-            // Set the highlight material depending on the player turn
-            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
-            {
-                nodeDisks[0].SetMaterial(NodeType.Yellow);
-            }
-            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
-            {
-                nodeDisks[0].SetMaterial(NodeType.Red);
-            }
+            ShowDiskAndSetMaterial(nodeDisks[0]);
         }
 
         private void OnNodeHoverExited(Node node)
@@ -83,7 +68,7 @@ namespace PlotFourVR
 
         private void OnNodeTypeChanged(Node node)
         {
-            if(node.ColumnIndex != columnIndex) return;
+            if (node.ColumnIndex != columnIndex) return;
 
             // move the disk to the node position
             Vector3 targetPosition = nodeParent.GetNodeTransform(node).position;
@@ -93,8 +78,25 @@ namespace PlotFourVR
                 Debug.LogWarning($"No disks available to move for pos: r{node.RowIndex}-c{node.ColumnIndex}");
                 return;
             }
+            ShowDiskAndSetMaterial(nodeDisks[0]);
+
             nodeDisks[0].MoveToSlot(targetPosition);
             nodeDisks.RemoveAt(0);
         }
+
+        private void ShowDiskAndSetMaterial(NodeDisk nodeDisk)
+        {
+            nodeDisk.Show();
+            // Set the highlight material depending on the player turn
+            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
+            {
+                nodeDisk.SetMaterial(NodeType.Yellow);
+            }
+            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
+            {
+                nodeDisk.SetMaterial(NodeType.Red);
+            }
+        }
+
     }
 }

@@ -17,7 +17,7 @@ namespace PlotFourVR
         {
             this.runtimeController = runtimeController;
 
-            RuntimeController.Instance.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
+            this.runtimeController.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
             parentCanvasGroup = parent.GetComponent<CanvasGroup>();
 
             Initialize();
@@ -27,7 +27,7 @@ namespace PlotFourVR
 
         protected virtual void OnDestroy()
         {
-            RuntimeController.Instance.EventBus.UiEvents.MenuPanelRequested -= OnMenuPanelRequested;
+            runtimeController.EventBus.UiEvents.MenuPanelRequested -= OnMenuPanelRequested;
         }
 
         private void OnMenuPanelRequested(PanelType requestedMenuType)

@@ -23,14 +23,14 @@ namespace PlotFourVR
             winLengthSlider.Slider.onValueChanged.AddListener(OnWinLengthSliderValueChanged);
 
             // subscribe to events to update the UI
-            RuntimeController.Instance.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+            runtimeController.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
+            runtimeController.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
+            runtimeController.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
 
             // Set the initial values for the UI elements
-            widthSlider.Slider.value = RuntimeController.Instance.ColumnCount;
-            heightSlider.Slider.value = RuntimeController.Instance.RowCount;
-            winLengthSlider.Slider.value = RuntimeController.Instance.WinLength;
+            widthSlider.Slider.value = runtimeController.ColumnCount;
+            heightSlider.Slider.value = runtimeController.RowCount;
+            winLengthSlider.Slider.value = runtimeController.WinLength;
         }
 
         protected override void OnDestroy()
@@ -45,22 +45,22 @@ namespace PlotFourVR
             winLengthSlider.Slider.onValueChanged.RemoveListener(OnWinLengthSliderValueChanged);
 
             // unsubscribe from events
-            RuntimeController.Instance.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
-            RuntimeController.Instance.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
+            runtimeController.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
+            runtimeController.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
+            runtimeController.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
         }
 
         private void OnAcceptButtonClicked()
         {
-            RuntimeController.Instance.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+            runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
             PanelDisabled();
         }
 
         private void OnResetToDefaultValuesButtonClicked()
         {
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeGridWidthChanged(9);
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeGridHeightChanged(7);
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeWinLengthChanged(4);
+            runtimeController.EventBus.SettingEvents.InvokeGridWidthChanged(9);
+            runtimeController.EventBus.SettingEvents.InvokeGridHeightChanged(7);
+            runtimeController.EventBus.SettingEvents.InvokeWinLengthChanged(4);
         }
 
         private void OnGridWidthChanged(int obj)
@@ -80,19 +80,19 @@ namespace PlotFourVR
         private void OnWidthSliderValueChanged(float arg0)
         {
             int width = (int)widthSlider.Slider.value;
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeGridWidthChanged(width);
+            runtimeController.EventBus.SettingEvents.InvokeGridWidthChanged(width);
         }
 
         private void OnHeightSliderValueChanged(float arg0)
         {
             int height = (int)heightSlider.Slider.value;
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeGridHeightChanged(height);
+            runtimeController.EventBus.SettingEvents.InvokeGridHeightChanged(height);
         }
 
         private void OnWinLengthSliderValueChanged(float arg0)
         {
             int winLength = (int)winLengthSlider.Slider.value;
-            RuntimeController.Instance.EventBus.SettingEvents.InvokeWinLengthChanged(winLength);
+            runtimeController.EventBus.SettingEvents.InvokeWinLengthChanged(winLength);
         }
     }
 }
