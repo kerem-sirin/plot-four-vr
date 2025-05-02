@@ -20,7 +20,7 @@ namespace PlotFourVR
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
 
-            RuntimeController.Instance.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
@@ -36,32 +36,32 @@ namespace PlotFourVR
             playAgainButton.onClick.RemoveListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
 
-            RuntimeController.Instance.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
+            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnMainMenuButtonClicked()
         {
-            RuntimeController.Instance.SetCurrentState(StateType.EndingCurrentGame);
+            runtimeController.SetCurrentState(StateType.EndingCurrentGame);
         }
 
         private void OnPlayAgainButtonClicked()
         {
-            RuntimeController.Instance.SetCurrentState(StateType.GameStarting);
+            runtimeController.SetCurrentState(StateType.GameStarting);
         }
 
         protected override void PanelEnabled()
         {
             base.PanelEnabled();
 
-            if (RuntimeController.Instance.GameResult == ResultType.PlayerOneWin)
+            if (runtimeController.GameResult == ResultType.PlayerOneWin)
             {
                 resultText.SetText("Victory for <color=yellow>Yellow!</color>");
             }
-            else if (RuntimeController.Instance.GameResult == ResultType.PlayerTwoWin)
+            else if (runtimeController.GameResult == ResultType.PlayerTwoWin)
             {
                 resultText.SetText("Victory for <color=red>Red!</color>");
             }
-            else if (RuntimeController.Instance.GameResult == ResultType.Draw)
+            else if (runtimeController.GameResult == ResultType.Draw)
             {
                 resultText.SetText("It's a Draw!");
             }
