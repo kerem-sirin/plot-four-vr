@@ -55,11 +55,11 @@ namespace PlotFourVR
 
             if (runtimeController.GameResult == ResultType.PlayerOneWin)
             {
-                resultText.SetText("Victory for <color=yellow>Yellow!</color>");
+                resultText.SetText("Victory for <color=yellow>Yellow</color>!");
             }
             else if (runtimeController.GameResult == ResultType.PlayerTwoWin)
             {
-                resultText.SetText("Victory for <color=red>Red!</color>");
+                resultText.SetText("Victory for <color=red>Red</color>!");
             }
             else if (runtimeController.GameResult == ResultType.Draw)
             {
