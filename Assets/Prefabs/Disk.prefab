@@ -40,7 +40,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2091204132356682313}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -77,7 +77,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.05
+  m_Time: 0.15
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -87,7 +87,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.1785704
+        value: 0.19047603
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -97,11 +97,11 @@ TrailRenderer:
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: 0
-        outSlope: 0
+        inSlope: -0.37278378
+        outSlope: -0.37278378
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.10857761
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
@@ -143,7 +143,7 @@ TrailRenderer:
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
+  m_MinVertexDistance: 0.35
   m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
@@ -231,8 +231,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35b5ee7249c581449a5610963a1086f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yellowMaterial: {fileID: 2100000, guid: 43ac0965ee854924480843cd90b1a765, type: 2}
-  redMaterial: {fileID: 2100000, guid: 99623a1a72cd279409c41d2a94cd960d, type: 2}
+  yellowDiskMaterial: {fileID: 2100000, guid: 43ac0965ee854924480843cd90b1a765, type: 2}
+  redDiskMaterial: {fileID: 2100000, guid: 99623a1a72cd279409c41d2a94cd960d, type: 2}
+  yellowTrailMaterial: {fileID: 2100000, guid: c0a7d5e0db1f1ce46a1a7800be6cf261, type: 2}
+  redTrailMaterial: {fileID: 2100000, guid: e9943c3476c9ecd4e8acc9e5e16cbe83, type: 2}
 --- !u!82 &245498613506821661
 AudioSource:
   m_ObjectHideFlags: 0
