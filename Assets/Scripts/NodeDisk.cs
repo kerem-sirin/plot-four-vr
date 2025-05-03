@@ -10,10 +10,12 @@ namespace PlotFourVR
         [SerializeField] private Material redMaterial;
 
         private MeshRenderer meshRenderer;
+        private AudioSource audioSource;
 
         private void Awake()
         {
             meshRenderer = GetComponent<MeshRenderer>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         public void SetPosition(Vector3 position)
@@ -44,9 +46,11 @@ namespace PlotFourVR
             }
         }
 
-        public void MoveToSlot(Vector3 position)
+        public void MoveToSlot(Vector3 position, float normalizedIndexDistance)
         {
-            transform.DOMove(position, 0.4f).SetEase(Ease.OutBounce);
+            audioSource.volume = normalizedIndexDistance;
+            transform.DOMove(position, 0.4f).OnStart(() => audioSource.Play())
+                .SetEase(Ease.OutBounce);
         }
     }
 }
