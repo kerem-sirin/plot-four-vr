@@ -27,5 +27,11 @@ namespace PlotFourVR
         {
             NodeTypeChanged?.Invoke(node);
         }
+
+        public event Action<Node> WinningNodeDetected;
+        public void InvokeWinningNodeDetected(Node node)
+        {
+            WinningNodeDetected?.Invoke(node);
+        }
     }
 }
