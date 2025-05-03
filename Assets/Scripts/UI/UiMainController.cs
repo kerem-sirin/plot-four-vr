@@ -4,7 +4,7 @@ namespace PlotFourVR
 {
     public class UiMainController : MonoBehaviour
     {
-        [SerializeField] private MenuController[] menuPanels;
+        private MenuController[] menuPanels;
         public void Initialize(RuntimeController runtimeController)
         {
             // Initialize UI elements and event listeners here
