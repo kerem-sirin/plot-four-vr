@@ -47,6 +47,11 @@ namespace PlotFourVR
             WinLength = DEFAULT_WIN_LENGTH;
         }
 
+        private void Start()
+        {
+            SetCurrentState(StateType.Initializing);
+        }
+
         private void OnWinLengthChanged(int newValue)
         {
             // Update the win length
@@ -65,9 +70,10 @@ namespace PlotFourVR
             ColumnCount = newValue;
         }
 
-        private void Start()
+        public bool IsGridSizeValid()
         {
-            SetCurrentState(StateType.Initializing);
+            // Check if the grid size is valid
+            return RowCount >= WinLength || ColumnCount >= WinLength;
         }
 
         public async void SetCurrentState(StateType stateType)

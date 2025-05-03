@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,16 +6,21 @@ namespace PlotFourVR
 {
     public class SettingsMenuController : MenuController
     {
+        public event Action<bool> GridSizeValidityChanged;
+
         [Header("Settings Menu Properties")]
         [SerializeField] private Button acceptButton;
         [SerializeField] private Button resetToDefaultValuesButton;
         [SerializeField] private SliderBehaviour widthSlider;
         [SerializeField] private SliderBehaviour heightSlider;
         [SerializeField] private SliderBehaviour winLengthSlider;
+        [SerializeField] private GameObject warningPanel;
+
+        private bool isGridSizeValid = true;
+        private SettingsListener[] settingsListeners;
 
         protected override void Initialize()
         {
-
             acceptButton.onClick.AddListener(OnAcceptButtonClicked);
             resetToDefaultValuesButton.onClick.AddListener(OnResetToDefaultValuesButtonClicked);
 
@@ -31,6 +37,12 @@ namespace PlotFourVR
             widthSlider.Slider.value = runtimeController.ColumnCount;
             heightSlider.Slider.value = runtimeController.RowCount;
             winLengthSlider.Slider.value = runtimeController.WinLength;
+
+            settingsListeners = GetComponentsInChildren<SettingsListener>();
+            foreach (var listener in settingsListeners)
+            {
+                listener.Initialize(this);
+            }
         }
 
         protected override void OnDestroy()
@@ -66,15 +78,18 @@ namespace PlotFourVR
         private void OnGridWidthChanged(int obj)
         {
             widthSlider.Slider.value = obj;
+            CheckGridSizeValidity();
         }
 
         private void OnGridHeightChanged(int obj)
         {
             heightSlider.Slider.value = obj;
+            CheckGridSizeValidity();
         }
         private void OnWinLengthChanged(int obj)
         {
             winLengthSlider.Slider.value = obj;
+            CheckGridSizeValidity();
         }
 
         private void OnWidthSliderValueChanged(float arg0)
@@ -93,6 +108,18 @@ namespace PlotFourVR
         {
             int winLength = (int)winLengthSlider.Slider.value;
             runtimeController.EventBus.SettingEvents.InvokeWinLengthChanged(winLength);
+        }
+
+        private void CheckGridSizeValidity()
+        {
+            // Check if the grid size is valid
+            bool isValid = runtimeController.IsGridSizeValid();
+            if (isValid != isGridSizeValid)
+            {
+                // if the grid size validity changes, fire event
+                isGridSizeValid = isValid;
+                GridSizeValidityChanged?.Invoke(isGridSizeValid);
+            }
         }
     }
 }

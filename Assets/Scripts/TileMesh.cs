@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace PlotFourVR
 {
@@ -6,14 +8,41 @@ namespace PlotFourVR
     {
         [SerializeField] private TileMeshType tileMeshType;
 
-        public void Initialize(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
+        [Header("References")]
+        [SerializeField] private Material idleMaterial;
+        [SerializeField] private Material hoverMaterial;
+
+        private MeshRenderer meshRenderer;
+
+        public void Initialize(XRSimpleInteractable xRSimpleInteractable, VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
         {
-            ToggleSelf(verticalAlignment, horizontalAlignment);
+            bool isRightMesh = IsRightMesh(verticalAlignment, horizontalAlignment);
+            gameObject.SetActive(isRightMesh);
+            if (!isRightMesh) return;
+
+            meshRenderer = GetComponent<MeshRenderer>();
+            meshRenderer.material = idleMaterial;
             RotateSelf(verticalAlignment, horizontalAlignment);
+            // subscribe to the node's hover events
+            xRSimpleInteractable.hoverEntered.AddListener(OnHoverEntered);
+            xRSimpleInteractable.hoverExited.AddListener(OnHoverExited);
+
+        }
+
+        private void OnHoverEntered(HoverEnterEventArgs arg0)
+        {
+            // change the material to the hover material
+            meshRenderer.material = hoverMaterial;
+        }
+
+        private void OnHoverExited(HoverExitEventArgs arg0)
+        {
+            // change the material back to the idle material
+            meshRenderer.material = idleMaterial;
         }
 
         // toggles self based on the node position in the grid
-        private void ToggleSelf(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
+        private bool IsRightMesh(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
         {
             // enable/disable the tile mesh based on the node position
             if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
@@ -22,7 +51,7 @@ namespace PlotFourVR
                 (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Right))
             {
                 // any corner
-                gameObject.SetActive(tileMeshType == TileMeshType.Corner);
+                return tileMeshType == TileMeshType.Corner;
             }
             else if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center) ||
                    (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Center) ||
@@ -30,11 +59,11 @@ namespace PlotFourVR
                    (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Right))
             {
                 // any side
-                gameObject.SetActive(tileMeshType == TileMeshType.Side);
+                return tileMeshType == TileMeshType.Side;
             }
             else
             {
-                gameObject.SetActive(tileMeshType == TileMeshType.Center);
+                return tileMeshType == TileMeshType.Center;
             }
         }
 

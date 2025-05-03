@@ -5,31 +5,42 @@ namespace PlotFourVR
 {
     public class ColumnHeadBehaviour : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] private Transform diskPrefab;
 
+        [Header("Materials")]
         [SerializeField] private Material redHighlightMaterial;
         [SerializeField] private Material yellowHighlightMaterial;
 
+        [Header("Sfx")]
+        [SerializeField] private AudioClip hoverSfx;
+        [SerializeField] private AudioClip selectSfx;
+
         private int columnIndex; // The index of the column this head belongs to
+        private int rowCount; // The number of rows in the grid
 
         private List<NodeDisk> nodeDisks;
 
         private RuntimeController runtimeController;
         private NodeParent nodeParent;
+        private AudioSource audioSource;
 
         public void Initialize(RuntimeController runtimeController, NodeParent nodeParent, int columnIndex, int rowCount)
         {
             this.runtimeController = runtimeController;
             this.nodeParent = nodeParent;
             this.columnIndex = columnIndex;
+            this.rowCount = rowCount;
 
             runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
             runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
             runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
 
+            audioSource = GetComponent<AudioSource>();
+
             // create disk pool 
-            nodeDisks = new List<NodeDisk>(rowCount);
-            for (int i = 0; i < rowCount; i++)
+            nodeDisks = new List<NodeDisk>(this.rowCount);
+            for (int i = 0; i < this.rowCount; i++)
             {
                 NodeDisk disk = Instantiate(diskPrefab, transform).GetComponent<NodeDisk>();
                 disk.Hide();
@@ -55,6 +66,7 @@ namespace PlotFourVR
                 return;
             }
             ShowDiskAndSetMaterial(nodeDisks[0]);
+            PlaySfx(hoverSfx);
         }
 
         private void OnNodeHoverExited(Node node)
@@ -79,8 +91,9 @@ namespace PlotFourVR
                 return;
             }
             ShowDiskAndSetMaterial(nodeDisks[0]);
-
-            nodeDisks[0].MoveToSlot(targetPosition);
+            // normalize the distance as row index
+            float normalizedIndexDistance = ((float)(rowCount - node.RowIndex) / rowCount);
+            nodeDisks[0].MoveToSlot(targetPosition, normalizedIndexDistance);
             nodeDisks.RemoveAt(0);
         }
 
@@ -98,5 +111,12 @@ namespace PlotFourVR
             }
         }
 
+        private void PlaySfx(AudioClip audioClip)
+        {
+            audioSource.pitch = Random.Range(0.9f, 1.3f);
+            audioSource.volume = Random.Range(0.8f, 1.0f);
+
+            audioSource.PlayOneShot(audioClip);
+        }
     }
 }

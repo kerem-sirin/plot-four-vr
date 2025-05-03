@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEditor.Experimental.GraphView;
 
 namespace PlotFourVR
 {
@@ -109,6 +110,7 @@ namespace PlotFourVR
             // position parent transform at the center of the grid
             transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * NODE_SPACING), transform.position.y, transform.position.z);
 
+            float columnHeadOffset = NODE_SPACING / 5f;
             // Initialize the column heads
             for (int column = 0; column < columnCount; column++)
             {
@@ -118,8 +120,9 @@ namespace PlotFourVR
                 // Name column head game object according to its position
                 columnHeadTransform.name = $"ColumnHead_{column}";
 
-                // Set the position of the column head
-                columnHeadTransform.localPosition = new Vector3(column * NODE_SPACING, rowCount * NODE_SPACING, 0f);
+                // Set the position of the column head.
+
+                columnHeadTransform.localPosition = new Vector3(column * NODE_SPACING, rowCount * NODE_SPACING + columnHeadOffset, 0f);
 
                 // Pass the column index to the column head component
                 ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
@@ -150,7 +153,7 @@ namespace PlotFourVR
                     NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
 
                     // Initialize the node with its row and column index
-                    nodeVisual.Initialize(runtimeController, node, columnHeads[column].position);
+                    nodeVisual.Initialize(runtimeController, node);
                 }
             }
 
@@ -202,6 +205,12 @@ namespace PlotFourVR
                     runtimeController.GameResult = ResultType.PlayerTwoWin;
                 }
                 runtimeController.SetCurrentState(StateType.GameOver);
+
+                // Enable Vfx for winning Nodes
+                foreach (Node winningNode in GetWinningTiles(firstAvailableNode))
+                {
+                    runtimeController.EventBus.InteractionEvents.InvokeWinningNodeDetected(winningNode);
+                }
             }
             // Check if the game is a draw
             else if (playedTileCount >= totalTileCount)
@@ -261,6 +270,51 @@ namespace PlotFourVR
                 }
             }
             return false;
+        }
+
+        private List<Node> GetWinningTiles(Node node)
+        {
+            int row = node.RowIndex;
+            int col = node.ColumnIndex;
+            NodeType activePlayersNodeType = node.NodeType;
+
+            List<Node> winningNodes = new List<Node>();
+            foreach (var (dr, dc) in directions)
+            {
+                int count = 0;
+                // Slide a window from -(winLength - 1) to (winLength - 1) around the new piece
+                int slideDistance = winLength - 1; // The distance to slide the window
+                for (int i = -slideDistance; i <= slideDistance; i++)
+                {
+                    int r = row + i * dr;
+                    int c = col + i * dc;
+
+                    // Check if the position is within bounds
+                    if (r >= 0 && r < rowCount && c >= 0 && c < columnCount)
+                    {
+                        // Check if the node is matches the player's type
+                        Node nodeCompared = GetNode(r, c);
+                        if (nodeCompared.NodeType == activePlayersNodeType)
+                        {
+                            winningNodes.Add(nodeCompared);
+                            count++;
+                            if (count >= winLength)
+                            {
+                                return winningNodes;
+                            }
+
+                        }
+                        else
+                        {
+                            // if the node is not the same type, reset the count
+                            // and clear the winning nodes list
+                            winningNodes.Clear();
+                            count = 0;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         private Node GetFirstAvailableNodeInColumn(int columnIndex)

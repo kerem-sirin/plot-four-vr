@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -8,18 +9,18 @@ namespace PlotFourVR
     public class NodeVisual : MonoBehaviour
     {
         private Node node;
-
         private XRSimpleInteractable xRSimpleInteractable;
-
         private RuntimeController runtimeController;
+        private ParticleSystem winningParticleSystem;
 
-        public void Initialize(RuntimeController runtimeController,Node node, Vector3 columnHeadPosition)
+        public void Initialize(RuntimeController runtimeController,Node node)
         {
             this.runtimeController = runtimeController;
 
             this.node = node;
 
             this.runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+            this.runtimeController.EventBus.InteractionEvents.WinningNodeDetected += OnWinningNodeDetected;
             this.runtimeController.GameStateChanged += OnGameStateChanged;
 
             xRSimpleInteractable = GetComponent<XRSimpleInteractable>();
@@ -28,10 +29,22 @@ namespace PlotFourVR
             xRSimpleInteractable.hoverExited.AddListener(OnHoverExited);
             xRSimpleInteractable.selectEntered.AddListener(OnSelectEntered);
 
+            winningParticleSystem = GetComponentInChildren<ParticleSystem>(true);
+
             // Toggle child tile mesh renderers based on node position
             TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
 
             UpdateNodeRotationInChildMeshes();
+        }
+
+        private void OnDestroy()
+        {
+            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
+            runtimeController.GameStateChanged -= OnGameStateChanged;
+
+            xRSimpleInteractable.hoverEntered.RemoveListener(OnHoverEntered);
+            xRSimpleInteractable.hoverExited.RemoveListener(OnHoverExited);
+            xRSimpleInteractable.selectEntered.RemoveListener(OnSelectEntered);
         }
 
         private void OnGameStateChanged(StateType stateType)
@@ -47,16 +60,22 @@ namespace PlotFourVR
                     xRSimpleInteractable.interactionLayers = 1;
                 }
             }
+            else if (stateType == StateType.None)
+            {
+                // Disable Vfx
+                if(winningParticleSystem.isPlaying)
+                {
+                    winningParticleSystem.gameObject.SetActive(false);
+                }
+            }
         }
 
-        private void OnDestroy()
+        private void OnWinningNodeDetected(Node node)
         {
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
-            runtimeController.GameStateChanged -= OnGameStateChanged;
-
-            xRSimpleInteractable.hoverEntered.RemoveListener(OnHoverEntered);
-            xRSimpleInteractable.hoverExited.RemoveListener(OnHoverExited);
-            xRSimpleInteractable.selectEntered.RemoveListener(OnSelectEntered);
+            if (this.node != node) return;
+            winningParticleSystem.gameObject.SetActive(true);
+            ParticleSystem.MainModule particleSystemMain = winningParticleSystem.main;
+            particleSystemMain.startColor = node.NodeType == NodeType.Yellow ? Color.yellow : Color.red;
         }
 
         private void OnNodeTypeChanged(Node node)
@@ -71,6 +90,7 @@ namespace PlotFourVR
         {
             // Show the node disk at the column head position
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)
@@ -126,7 +146,7 @@ namespace PlotFourVR
             TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
             foreach (TileMesh tileMesh in tileMeshes)
             {
-                tileMesh.Initialize(verticalAlignment, horizontalAlignment);
+                tileMesh.Initialize(xRSimpleInteractable, verticalAlignment, horizontalAlignment);
             }
         }
     }
