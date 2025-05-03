@@ -8,9 +8,7 @@ namespace PlotFourVR
     public class NodeVisual : MonoBehaviour
     {
         private Node node;
-
         private XRSimpleInteractable xRSimpleInteractable;
-
         private RuntimeController runtimeController;
 
         public void Initialize(RuntimeController runtimeController,Node node, Vector3 columnHeadPosition)
@@ -71,6 +69,7 @@ namespace PlotFourVR
         {
             // Show the node disk at the column head position
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)

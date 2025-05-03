@@ -5,10 +5,16 @@ namespace PlotFourVR
 {
     public class ColumnHeadBehaviour : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] private Transform diskPrefab;
 
+        [Header("Materials")]
         [SerializeField] private Material redHighlightMaterial;
         [SerializeField] private Material yellowHighlightMaterial;
+
+        [Header("Sfx")]
+        [SerializeField] private AudioClip hoverSfx;
+        [SerializeField] private AudioClip selectSfx;
 
         private int columnIndex; // The index of the column this head belongs to
         private int rowCount; // The number of rows in the grid
@@ -17,6 +23,7 @@ namespace PlotFourVR
 
         private RuntimeController runtimeController;
         private NodeParent nodeParent;
+        private AudioSource audioSource;
 
         public void Initialize(RuntimeController runtimeController, NodeParent nodeParent, int columnIndex, int rowCount)
         {
@@ -28,6 +35,8 @@ namespace PlotFourVR
             runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
             runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
             runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+
+            audioSource = GetComponent<AudioSource>();
 
             // create disk pool 
             nodeDisks = new List<NodeDisk>(this.rowCount);
@@ -57,6 +66,7 @@ namespace PlotFourVR
                 return;
             }
             ShowDiskAndSetMaterial(nodeDisks[0]);
+            PlaySfx(hoverSfx);
         }
 
         private void OnNodeHoverExited(Node node)
@@ -101,5 +111,12 @@ namespace PlotFourVR
             }
         }
 
+        private void PlaySfx(AudioClip audioClip)
+        {
+            audioSource.pitch = Random.Range(0.9f, 1.3f);
+            audioSource.volume = Random.Range(0.8f, 1.0f);
+
+            audioSource.PlayOneShot(audioClip);
+        }
     }
 }
