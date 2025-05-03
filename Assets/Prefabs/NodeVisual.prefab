@@ -5158,6 +5158,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 80381da9391b0014a96c0f0459017e35, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3e73384e7a331fa4da77638b95d35a2b, type: 2}
     - target: {fileID: 919132149155446097, guid: 80381da9391b0014a96c0f0459017e35, type: 3}
       propertyPath: m_Name
       value: TileSide
@@ -5247,6 +5251,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 87e838a428f8bab4cb00916c0b1e8c10, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3e73384e7a331fa4da77638b95d35a2b, type: 2}
     - target: {fileID: 919132149155446097, guid: 87e838a428f8bab4cb00916c0b1e8c10, type: 3}
       propertyPath: m_Name
       value: TileMiddle
@@ -5336,6 +5344,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+    - target: {fileID: -7511558181221131132, guid: d2108cb282830804a9e86cf10aa0fafe, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3e73384e7a331fa4da77638b95d35a2b, type: 2}
     - target: {fileID: 919132149155446097, guid: d2108cb282830804a9e86cf10aa0fafe, type: 3}
       propertyPath: m_Name
       value: TileCorner
