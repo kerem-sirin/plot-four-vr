@@ -359,6 +359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileMeshType: 3
+  idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}
 --- !u!1001 &5932906967155743991
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -446,6 +448,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileMeshType: 1
+  idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}
 --- !u!1001 &6166303106684446580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -533,3 +537,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileMeshType: 2
+  idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}

@@ -125,7 +125,7 @@ namespace PlotFourVR
             TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
             foreach (TileMesh tileMesh in tileMeshes)
             {
-                tileMesh.Initialize(verticalAlignment, horizontalAlignment);
+                tileMesh.Initialize(xRSimpleInteractable, verticalAlignment, horizontalAlignment);
             }
         }
     }
