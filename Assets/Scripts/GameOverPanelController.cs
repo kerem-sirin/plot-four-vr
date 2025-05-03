@@ -73,6 +73,16 @@ namespace PlotFourVR
         private string FormatTime(float playtime)
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(playtime);
+            if (timeSpan.Hours < 1)
+            {
+                if (timeSpan.Minutes < 1)
+                {
+                    return string.Format("{0:D2}s", timeSpan.Seconds);
+                }
+
+                return string.Format("{0:D2}m:{1:D2}s", timeSpan.Minutes, timeSpan.Seconds);
+            }
+
             return string.Format("{0:D2}h:{1:D2}m:{2:D2}s", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
     }

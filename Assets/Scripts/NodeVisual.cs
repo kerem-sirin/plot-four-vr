@@ -13,7 +13,7 @@ namespace PlotFourVR
         private RuntimeController runtimeController;
         private ParticleSystem winningParticleSystem;
 
-        public void Initialize(RuntimeController runtimeController,Node node, Vector3 columnHeadPosition)
+        public void Initialize(RuntimeController runtimeController,Node node)
         {
             this.runtimeController = runtimeController;
 

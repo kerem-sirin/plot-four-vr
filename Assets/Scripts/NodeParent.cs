@@ -110,6 +110,7 @@ namespace PlotFourVR
             // position parent transform at the center of the grid
             transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * NODE_SPACING), transform.position.y, transform.position.z);
 
+            float columnHeadOffset = NODE_SPACING / 5f;
             // Initialize the column heads
             for (int column = 0; column < columnCount; column++)
             {
@@ -119,8 +120,9 @@ namespace PlotFourVR
                 // Name column head game object according to its position
                 columnHeadTransform.name = $"ColumnHead_{column}";
 
-                // Set the position of the column head
-                columnHeadTransform.localPosition = new Vector3(column * NODE_SPACING, rowCount * NODE_SPACING, 0f);
+                // Set the position of the column head.
+
+                columnHeadTransform.localPosition = new Vector3(column * NODE_SPACING, rowCount * NODE_SPACING + columnHeadOffset, 0f);
 
                 // Pass the column index to the column head component
                 ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
@@ -151,7 +153,7 @@ namespace PlotFourVR
                     NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
 
                     // Initialize the node with its row and column index
-                    nodeVisual.Initialize(runtimeController, node, columnHeads[column].position);
+                    nodeVisual.Initialize(runtimeController, node);
                 }
             }
 
