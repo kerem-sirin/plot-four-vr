@@ -15,6 +15,7 @@ namespace PlotFourVR
         // Player NodeTypes
         public NodeType PlayerOneNodeType => NodeType.Yellow;
         public NodeType PlayerTwoNodeType => NodeType.Red;
+        public NodeType PlayerThreeNodeType => NodeType.Green;
 
         public StateType CurrentState => currentState;
         private StateType currentState;
@@ -30,6 +31,7 @@ namespace PlotFourVR
         public int RowCount { get; private set; }
         public int ColumnCount { get; private set; }
         public int WinLength { get; private set; }
+        public OpponentType OpponentType { get; private set; }
 
         public ResultType GameResult { get; set; } = ResultType.None;
 
@@ -40,11 +42,13 @@ namespace PlotFourVR
             EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
             EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
             EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+            EventBus.SettingEvents.OpponentTypeChanged += OnOpponentTypeChanged;
 
             // Set default values
             RowCount = DEFAULT_GRID_HEIGHT;
             ColumnCount = DEFAULT_GRID_WIDTH;
             WinLength = DEFAULT_WIN_LENGTH;
+            OpponentType = OpponentType.Hal9000;
         }
 
         private void Start()
@@ -70,6 +74,12 @@ namespace PlotFourVR
             ColumnCount = newValue;
         }
 
+        private void OnOpponentTypeChanged(OpponentType opponentType)
+        {
+            // Update the opponent type
+            OpponentType = opponentType;
+        }
+
         public bool IsGridSizeValid()
         {
             // Check if the grid size is valid
@@ -84,7 +94,7 @@ namespace PlotFourVR
                 
             if(currentState == StateType.Initializing)
             {
-                // instantiate uiMainTransform
+                // instantiate UI_Main.prefab
                 if (uiMainController != null)
                 {
                     Destroy(uiMainController.gameObject);
@@ -93,14 +103,14 @@ namespace PlotFourVR
                 uiMainController.Initialize(this);
                 SetCurrentState(StateType.Idle);
             }
-
-            if (currentState == StateType.Idle)
+            else if (currentState == StateType.Idle)
             {
+                // User is interacting with main menu and settings in this state
                 EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
             }
-
-            if (currentState == StateType.GameStarting)
+            else if (currentState == StateType.GameStarting)
             {
+                // Settings are already set, create the grid in this state
                 if (nodeParent != null)
                 {
                     nodeParent.Destroy();
@@ -110,15 +120,13 @@ namespace PlotFourVR
                 nodeParent = Instantiate(nodeParentTransform).GetComponent<NodeParent>();
                 nodeParent.Initialize(this);
             }
-
-            if (currentState == StateType.EndingCurrentGame)
+            else if (currentState == StateType.EndingCurrentGame)
             {
-                if (nodeParent != null)
-                {
-                    nodeParent.Destroy();
-                    SetCurrentState(StateType.Idle);
+                // Destroy the grid and go back to the main menu& settings
+                if (nodeParent == null) return;
 
-                }
+                nodeParent.Destroy();
+                SetCurrentState(StateType.Idle);
             }
             GameStateChanged?.Invoke(currentState);
         }
@@ -133,14 +141,15 @@ namespace PlotFourVR
 
     public enum  StateType
     {
-        None,
-        GameStarting,
-        PlayerOneTurn,
-        PlayerTwoTurn,
+        None, // transition state between other states
+        GameStarting, // settings are set, creatring the grid
+        PlayerOneTurn, // Main player, yellow
+        PlayerTwoTurn, // human player, red
         GameOver,
-        EndingCurrentGame,
-        Initializing,
-        Idle,
+        EndingCurrentGame, // destroying the grid and going back to the main menu
+        Initializing, // initial state main menu is instantiated
+        Idle, // main menu active, waiting for user input
+        PlayerThreeTurn, // AI player, green
     }
 
     public enum ResultType
@@ -148,6 +157,13 @@ namespace PlotFourVR
         None,
         PlayerOneWin,
         PlayerTwoWin,
+        PlayerThreeWin,
         Draw
+    }
+
+    public enum  OpponentType
+    {
+        HomoSapiens,
+        Hal9000,
     }
 }

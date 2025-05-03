@@ -75,7 +75,18 @@ namespace PlotFourVR
             if (this.node != node) return;
             winningParticleSystem.gameObject.SetActive(true);
             ParticleSystem.MainModule particleSystemMain = winningParticleSystem.main;
-            particleSystemMain.startColor = node.NodeType == NodeType.Yellow ? Color.yellow : Color.red;
+            if (node.NodeType == NodeType.Yellow)
+            {
+                particleSystemMain.startColor = Color.yellow;
+            }
+            else if (node.NodeType == NodeType.Red)
+            {
+                particleSystemMain.startColor = Color.red;
+            }
+            else if (node.NodeType == NodeType.Green)
+            {
+                particleSystemMain.startColor = Color.green;
+            }
         }
 
         private void OnNodeTypeChanged(Node node)
@@ -155,6 +166,7 @@ namespace PlotFourVR
     {
         Empty,
         Yellow,
-        Red
+        Red,
+        Green
     }
 }

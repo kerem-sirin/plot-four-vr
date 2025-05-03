@@ -16,6 +16,7 @@ namespace PlotFourVR
         [SerializeField] private TextMeshProUGUI widthInfoText;
         [SerializeField] private TextMeshProUGUI heightInfoText;
         [SerializeField] private TextMeshProUGUI winLengthInfoText;
+        [SerializeField] private TMP_Dropdown opponentTypeDropdownMenu;
 
         protected override void Initialize()
         {
@@ -26,6 +27,8 @@ namespace PlotFourVR
             runtimeController.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
             runtimeController.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
             runtimeController.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+
+            opponentTypeDropdownMenu.onValueChanged.AddListener(OnOpponentTypeChanged);
 
             // Set the initial values for the UI elements
             widthInfoText.SetText(runtimeController.ColumnCount.ToString());
@@ -38,6 +41,8 @@ namespace PlotFourVR
             base.OnDestroy();
             playButton.onClick.RemoveListener(OnPlayButtonClicked);
             settingsButton.onClick.RemoveListener(OnSettingsButtonClicked);
+
+            opponentTypeDropdownMenu.onValueChanged.RemoveListener(OnOpponentTypeChanged);
 
             // unsubscribe from events
             runtimeController.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
@@ -56,6 +61,13 @@ namespace PlotFourVR
         {
             // Handle settings button click
             runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
+        }
+
+        private void OnOpponentTypeChanged(int arg0)
+        {
+            // publish the event to change the opponent type
+            OpponentType opponentType = (OpponentType)arg0;
+            runtimeController.EventBus.SettingEvents.InvokeOpponentTypeChanged(opponentType);
         }
 
         private void OnGridWidthChanged(int obj)

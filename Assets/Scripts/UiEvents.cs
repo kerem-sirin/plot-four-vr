@@ -25,6 +25,7 @@ namespace PlotFourVR
         YellowTurnMenu,
         RedTurnMenu,
         GameOverMenu,
-        None
+        None,
+        GreenTurnMenu,
     }
 }

@@ -21,5 +21,11 @@ namespace PlotFourVR
         {
             WinLengthChanged?.Invoke(newWinLength);
         }
+
+        public event Action<OpponentType> OpponentTypeChanged;
+        public void InvokeOpponentTypeChanged(OpponentType newOpponentType)
+        {
+            OpponentTypeChanged?.Invoke(newOpponentType);
+        }
     }
 }

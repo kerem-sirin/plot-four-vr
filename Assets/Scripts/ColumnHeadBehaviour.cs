@@ -11,6 +11,7 @@ namespace PlotFourVR
         [Header("Materials")]
         [SerializeField] private Material redHighlightMaterial;
         [SerializeField] private Material yellowHighlightMaterial;
+        [SerializeField] private Material greenDiskMaterial;
 
         [Header("Sfx")]
         [SerializeField] private AudioClip hoverSfx;
@@ -108,6 +109,10 @@ namespace PlotFourVR
             else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
             {
                 nodeDisk.SetMaterial(NodeType.Red);
+            }
+            else if (runtimeController.CurrentState == StateType.PlayerThreeTurn)
+            {
+                nodeDisk.SetMaterial(NodeType.Green);
             }
         }
 
