@@ -93,16 +93,59 @@ namespace PlotFourVR
                 node.NodeType = NodeType.Empty;
             }
 
+            await Task.Delay(100);
             //Block opponent's fork
+            foreach (Node node in availableNodes)
+            {
+                // Check if placing a disc here would create a fork
+                node.NodeType = NodeType.Yellow;
 
-            //Take the center
+                // Get the remaining available nodes
+                foreach (Node nextNode in availableNodes)
+                {
+                    nextNode.NodeType = NodeType.Yellow;
+                    if (nodeParent.IsWinningMove(nextNode))
+                    {
+                        node.NodeType = NodeType.Empty;
+                        nextNode.NodeType = NodeType.Empty;
+                        if (nodeParent.IsBelowNeighbourOccupied(node))
+                        {
+                            // Reset the node type back to empty
+                            Debug.Log("AI: Playeres Fork blocked");
+                            Debug.Log("AI: " + node.RowIndex + ":" + node.ColumnIndex);
+                            return node;
+                        }
+                    }
+                    nextNode.NodeType = NodeType.Empty;
+                }
+                // Reset the node type back to empty
+                node.NodeType = NodeType.Empty;
+            }
 
-            //Play next to your discs
-
-            //Play in an edge if available
+            //Take the center for bottom rows
+            for (int i = 0; i < availableNodes.Count; i++)
+            {
+                Node node = availableNodes[i];
+                // Try to fake intelligence with cheap, hard coded tricks and magical numbers
+                if (node.RowIndex < 4)
+                {
+                    int centerColumn = Mathf.FloorToInt(availableNodes.Count / 2f);
+                    int acceptedDistance = Mathf.CeilToInt(availableNodes.Count / 3f);
+                    Debug.Log("AI: acceptedDistance: " + acceptedDistance);
+                    // Check if the node is around the center
+                    if (i > centerColumn - acceptedDistance  &&
+                        i < centerColumn + acceptedDistance)
+                    {
+                        // Reset the node type back to empty
+                        node.NodeType = NodeType.Empty;
+                        Debug.Log("AI: Center move played");
+                        Debug.Log("AI: " + node.RowIndex + ":" + node.ColumnIndex);
+                        return node;
+                    }
+                }
+            }
 
             // Fallback, if multiple moves tie, pick one at random
-
             await Task.Delay(100);
             // for testing purposes play a random move
             int randomIndex = Random.Range(0, availableNodes.Count);
