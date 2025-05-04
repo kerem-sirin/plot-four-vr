@@ -20,7 +20,7 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
 
-            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
@@ -36,42 +36,42 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.RemoveListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
 
-            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnMainMenuButtonClicked()
         {
-            runtimeController.SetCurrentState(StateType.EndingCurrentGame);
+            lifecycle.SetGameStateAsync(StateType.EndingCurrentGame);
         }
 
         private void OnPlayAgainButtonClicked()
         {
-            runtimeController.SetCurrentState(StateType.GameStarting);
+            lifecycle.SetGameStateAsync(StateType.GameStarting);
         }
 
         protected override void PanelEnabled()
         {
             base.PanelEnabled();
 
-            if (runtimeController.GameResult == ResultType.PlayerOneWin)
+            if (lifecycle.GameResult == ResultType.PlayerOneWin)
             {
                 resultText.SetText("Victory for <color=yellow>Yellow</color>!");
             }
-            else if (runtimeController.GameResult == ResultType.PlayerTwoWin)
+            else if (lifecycle.GameResult == ResultType.PlayerTwoWin)
             {
                 resultText.SetText("Victory for <color=red>Red</color>!");
             }
-            else if (runtimeController.GameResult == ResultType.PlayerThreeWin)
+            else if (lifecycle.GameResult == ResultType.PlayerThreeWin)
             {
                 resultText.SetText("Victory for <color=green>Green</color>!");
             }
-            else if (runtimeController.GameResult == ResultType.Draw)
+            else if (lifecycle.GameResult == ResultType.Draw)
             {
                 resultText.SetText("It's a Draw!");
             }
 
-            tilesPlayedText.SetText(runtimeController.Grid.PlayedTileCount.ToString());
-            playTimeText.SetText(FormatTime(runtimeController.Grid.PlayTime));
+            tilesPlayedText.SetText(lifecycle.Grid.PlayedTileCount.ToString());
+            playTimeText.SetText(FormatTime(lifecycle.Grid.PlayTime));
         }
 
         private string FormatTime(float playtime)

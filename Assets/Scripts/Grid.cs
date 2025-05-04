@@ -23,7 +23,7 @@ namespace PlotFourVR
         private Dictionary<int, Transform> columnHeads = new();
 
         private StateType currentStateType;
-        private RuntimeController runtimeController;
+        private GameLifescycleController lifecycle;
         private bool canPlayTile;
 
         public int PlayedTileCount => playedTileCount; // Number of tiles played by the player  
@@ -41,15 +41,15 @@ namespace PlotFourVR
             (1, -1)
         };
 
-        public void Initialize(RuntimeController runtimeController)
+        public void Initialize(GameLifescycleController lifecycle)
         {
-            this.runtimeController = runtimeController;
+            this.lifecycle = lifecycle;
 
             decideComputerMovement = new DecideComputerMovement(this);
 
             // Subscribe to events
-            runtimeController.GameStateChanged += OnGameStateChanged;
-            runtimeController.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
+            lifecycle.GameStateChanged += OnGameStateChanged;
+            lifecycle.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
 
             // Draw the grid
             DrawGrid();
@@ -68,8 +68,8 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            runtimeController.GameStateChanged -= OnGameStateChanged;
-            runtimeController.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
+            lifecycle.GameStateChanged -= OnGameStateChanged;
+            lifecycle.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
         }
 
         private async void OnGameStateChanged(StateType stateType)
@@ -83,7 +83,7 @@ namespace PlotFourVR
             {
                 canPlayTile = true;
                 Node node = await decideComputerMovement.DecideMoveAsync();
-                runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+                lifecycle.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
                 // wait for a short delay to simulate thinking time
                 await Task.Delay(400);
                 OnNodeInteracted(node);
@@ -91,7 +91,7 @@ namespace PlotFourVR
             else if (stateType == StateType.GameOver)
             {
                 // Handle game over state
-                runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
+                lifecycle.EventBus.UiEvents.RequestMenuPanel(PanelType.GameOverMenu);
             }
         }
 
@@ -109,24 +109,24 @@ namespace PlotFourVR
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
                 // Set the node parent transform to the center of the grid
-                runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+                lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
 
                 // get the top left node, broadcast the position for menu repositioning
                 Node topLeftNode = GetNode(0, 0);
                 Vector3 topLeftNodePostion = GetNodeTransform(topLeftNode).position;
-                runtimeController.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
+                lifecycle.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
             });
         }
 
         private void ResetVariables()
         {
             // Set grid dimensions
-            rowCount = runtimeController.RowCount;
-            columnCount = runtimeController.ColumnCount;
-            winLength = runtimeController.WinLength;
+            rowCount = lifecycle.RowCount;
+            columnCount = lifecycle.ColumnCount;
+            winLength = lifecycle.WinLength;
 
             // Reset the game state
-            runtimeController.GameResult = ResultType.None;
+            lifecycle.GameResult = ResultType.None;
 
             // Clear dictionaries
             nodeDictionary.Clear();
@@ -165,7 +165,7 @@ namespace PlotFourVR
 
                 // Pass the column index to the column head component
                 ColumnHeadBehaviour columnHeadComponent = columnHeadTransform.GetComponent<ColumnHeadBehaviour>();
-                columnHeadComponent.Initialize(runtimeController, this, column, rowCount);
+                columnHeadComponent.Initialize(lifecycle, this, column, rowCount);
 
                 // Add the column head to the dictionary
                 columnHeads.Add(column, columnHeadTransform);
@@ -195,7 +195,7 @@ namespace PlotFourVR
                     NodeVisual nodeVisual = nodeTransform.GetComponent<NodeVisual>();
 
                     // Initialize the node with its row and column index
-                    nodeVisual.Initialize(runtimeController, node);
+                    nodeVisual.Initialize(lifecycle, node);
                 }
             }
         }
@@ -222,17 +222,17 @@ namespace PlotFourVR
             // Set the node type to the active player's node type
             if (currentStateType == StateType.PlayerOneTurn)
             {
-                firstAvailableNode.NodeType = runtimeController.PlayerOneNodeType;
+                firstAvailableNode.NodeType = lifecycle.PlayerOneNodeType;
             }
             else if (currentStateType == StateType.PlayerTwoTurn)
             {
-                firstAvailableNode.NodeType = runtimeController.PlayerTwoNodeType;
+                firstAvailableNode.NodeType = lifecycle.PlayerTwoNodeType;
             }
             else if(currentStateType == StateType.PlayerThreeTurn)
             {
-                firstAvailableNode.NodeType = runtimeController.PlayerThreeNodeType;
+                firstAvailableNode.NodeType = lifecycle.PlayerThreeNodeType;
             }
-            runtimeController.EventBus.InteractionEvents.InvokeNodeTypeChanged(firstAvailableNode);
+            lifecycle.EventBus.InteractionEvents.InvokeNodeTypeChanged(firstAvailableNode);
         }
 
         private void TurnEndChecks(Node firstAvailableNode)
@@ -242,29 +242,29 @@ namespace PlotFourVR
             {
                 if (currentStateType == StateType.PlayerOneTurn)
                 {
-                    runtimeController.GameResult = ResultType.PlayerOneWin;
+                    lifecycle.GameResult = ResultType.PlayerOneWin;
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
-                    runtimeController.GameResult = ResultType.PlayerTwoWin;
+                    lifecycle.GameResult = ResultType.PlayerTwoWin;
                 }
                 else if (currentStateType == StateType.PlayerThreeTurn)
                 {
-                    runtimeController.GameResult = ResultType.PlayerThreeWin;
+                    lifecycle.GameResult = ResultType.PlayerThreeWin;
                 }
-                runtimeController.SetCurrentState(StateType.GameOver);
+                lifecycle.SetGameStateAsync(StateType.GameOver);
 
                 // Enable Vfx for winning Nodes
                 foreach (Node winningNode in GetWinningTiles(firstAvailableNode))
                 {
-                    runtimeController.EventBus.InteractionEvents.InvokeWinningNodeDetected(winningNode);
+                    lifecycle.EventBus.InteractionEvents.InvokeWinningNodeDetected(winningNode);
                 }
             }
             // Check if the game is a draw
             else if (playedTileCount >= totalTileCount)
             {
-                runtimeController.GameResult = ResultType.Draw;
-                runtimeController.SetCurrentState(StateType.GameOver);
+                lifecycle.GameResult = ResultType.Draw;
+                lifecycle.SetGameStateAsync(StateType.GameOver);
             }
             // Noone won, there are still moves left
             else
@@ -272,22 +272,22 @@ namespace PlotFourVR
                 // Check who played, switch to the other player's turn
                 if (currentStateType == StateType.PlayerOneTurn)
                 {
-                    if (runtimeController.OpponentType == OpponentType.HomoSapiens)
+                    if (lifecycle.OpponentType == OpponentType.HomoSapiens)
                     {
-                        runtimeController.SetCurrentState(StateType.PlayerTwoTurn);
+                        lifecycle.SetGameStateAsync(StateType.PlayerTwoTurn);
                     }
-                    else if (runtimeController.OpponentType == OpponentType.Hal9000)
+                    else if (lifecycle.OpponentType == OpponentType.Hal9000)
                     {
-                        runtimeController.SetCurrentState(StateType.PlayerThreeTurn);
+                        lifecycle.SetGameStateAsync(StateType.PlayerThreeTurn);
                     }
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
-                    runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+                    lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
                 }
                 else if (currentStateType == StateType.PlayerThreeTurn)
                 {
-                    runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+                    lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
                 }
             }
         }

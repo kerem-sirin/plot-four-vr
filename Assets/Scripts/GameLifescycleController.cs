@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace PlotFourVR
 {
-    public class RuntimeController : MonoBehaviour
+    /// <summary>
+    /// Manages high-level game states, grid setup, and UI transitions.
+    /// </summary>
+    public class GameLifescycleController : MonoBehaviour
     {
         public const int DEFAULT_GRID_WIDTH = 9;
         public const int DEFAULT_GRID_HEIGHT = 7;
@@ -47,97 +50,99 @@ namespace PlotFourVR
             EventBus.SettingEvents.OpponentTypeChanged += OnOpponentTypeChanged;
 
             // Set default values
+            ApplyDefaultSettings();
+        }
+
+        private void Start()
+        {
+            _ = SetGameStateAsync(StateType.Initializing);
+        }
+
+        private void ApplyDefaultSettings()
+        {
             RowCount = DEFAULT_GRID_HEIGHT;
             ColumnCount = DEFAULT_GRID_WIDTH;
             WinLength = DEFAULT_WIN_LENGTH;
             OpponentType = OpponentType.HomoSapiens;
         }
 
-        private void Start()
-        {
-            SetCurrentState(StateType.Initializing);
-        }
+        private void OnGridWidthChanged(int width) => ColumnCount = width;
+        private void OnGridHeightChanged(int height) => RowCount = height;
+        private void OnWinLengthChanged(int length) => WinLength = length;
+        private void OnOpponentTypeChanged(OpponentType opponent) => OpponentType = opponent;
+        public bool IsGridSizeValid() => RowCount >= WinLength || ColumnCount >= WinLength;
 
-        private void OnWinLengthChanged(int newValue)
+        public async Task SetGameStateAsync(StateType stateType)
         {
-            // Update the win length
-            WinLength = newValue;
-        }
-
-        private void OnGridHeightChanged(int newValue)
-        {
-            // Update the grid height
-            RowCount = newValue;
-        }
-
-        private void OnGridWidthChanged(int newValue)
-        {
-            // Update the grid width
-            ColumnCount = newValue;
-        }
-
-        private void OnOpponentTypeChanged(OpponentType opponentType)
-        {
-            // Update the opponent type
-            OpponentType = opponentType;
-        }
-
-        public bool IsGridSizeValid()
-        {
-            // Check if the grid size is valid
-            return RowCount >= WinLength || ColumnCount >= WinLength;
-        }
-
-        public async void SetCurrentState(StateType stateType)
-        {
-            await RefreshBeforePublishingNewState();
+            await TransitionDelayAsync();
 
             currentState = stateType;
                 
             if(currentState == StateType.Initializing)
             {
                 // instantiate UI_Main.prefab
-                if (uiMainController != null)
-                {
-                    Destroy(uiMainController.gameObject);
-                }
-                uiMainController = Instantiate(uiMainPrefab).GetComponent<UiMainController>();
-                uiMainController.Initialize(this);
-                SetCurrentState(StateType.Idle);
+                await InitializeUIAsync();
             }
             else if (currentState == StateType.Idle)
             {
                 // User is interacting with main menu and settings in this state
-                EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+                ShowMainMenu();
             }
             else if (currentState == StateType.GameStarting)
             {
                 // Settings are already set, create the grid in this state
-                if (grid != null)
-                {
-                    grid.Destroy();
-                }
-
-                // instantiate nodeParentTransform
-                grid = Instantiate(gridPrefab).GetComponent<Grid>();
-                grid.Initialize(this);
+                StartNewGame();
             }
             else if (currentState == StateType.EndingCurrentGame)
             {
                 // Destroy the grid and go back to the main menu& settings
-                if (grid == null) return;
-
-                grid.Destroy();
-                SetCurrentState(StateType.Idle);
+                EndCurrentGame();
             }
             GameStateChanged?.Invoke(currentState);
         }
 
-        public async Task RefreshBeforePublishingNewState()
+        private async Task TransitionDelayAsync()
         {
             EventBus.UiEvents.RequestMenuPanel(PanelType.None);
             GameStateChanged?.Invoke(StateType.None);
             await Task.Delay(600);
+        }
+
+        private async Task InitializeUIAsync()
+        {
+            if (uiMainController != null)
+            {
+                Destroy(uiMainController.gameObject);
+            }
+
+            uiMainController = Instantiate(uiMainPrefab).GetComponent<UiMainController>();
+            uiMainController.Initialize(this);
+
+            await SetGameStateAsync(StateType.Idle);
+        }
+
+        private void ShowMainMenu()
+        {
+            EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+        }
+
+        private void StartNewGame()
+        {
+            if (grid != null)
+            {
+                grid.Destroy();
+            }
+
+            grid = Instantiate(gridPrefab).GetComponent<Grid>();
+            grid.Initialize(this);
+        }
+
+        private void EndCurrentGame()
+        {
+            if (grid == null)return;
+
+            grid.Destroy();
+            _ = SetGameStateAsync(StateType.Idle);
         }
     }
 

@@ -9,18 +9,18 @@ namespace PlotFourVR
     {
         private Node node;
         private XRSimpleInteractable xRSimpleInteractable;
-        private RuntimeController runtimeController;
+        private GameLifescycleController lifecycle;
         private ParticleSystem winningParticleSystem;
 
-        public void Initialize(RuntimeController runtimeController,Node node)
+        public void Initialize(GameLifescycleController lifecycle,Node node)
         {
-            this.runtimeController = runtimeController;
+            this.lifecycle = lifecycle;
 
             this.node = node;
 
-            this.runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
-            this.runtimeController.EventBus.InteractionEvents.WinningNodeDetected += OnWinningNodeDetected;
-            this.runtimeController.GameStateChanged += OnGameStateChanged;
+            this.lifecycle.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+            this.lifecycle.EventBus.InteractionEvents.WinningNodeDetected += OnWinningNodeDetected;
+            this.lifecycle.GameStateChanged += OnGameStateChanged;
 
             xRSimpleInteractable = GetComponent<XRSimpleInteractable>();
 
@@ -38,8 +38,8 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
-            runtimeController.GameStateChanged -= OnGameStateChanged;
+            lifecycle.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
+            lifecycle.GameStateChanged -= OnGameStateChanged;
 
             xRSimpleInteractable.hoverEntered.RemoveListener(OnHoverEntered);
             xRSimpleInteractable.hoverExited.RemoveListener(OnHoverExited);
@@ -99,18 +99,18 @@ namespace PlotFourVR
         private void OnHoverEntered(HoverEnterEventArgs arg0)
         {
             // Show the node disk at the column head position
-            runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+            lifecycle.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)
         {
             // Hide the node disk
-            runtimeController.EventBus.InteractionEvents.InvokeNodeHoverExited(node);
+            lifecycle.EventBus.InteractionEvents.InvokeNodeHoverExited(node);
         }
 
         private void OnSelectEntered(SelectEnterEventArgs arg0)
         {
-            runtimeController.EventBus.InteractionEvents.InvokeNodeInteracted(node);
+            lifecycle.EventBus.InteractionEvents.InvokeNodeInteracted(node);
         }
 
         private void UpdateNodeRotationInChildMeshes()
@@ -124,7 +124,7 @@ namespace PlotFourVR
                 // bottom row
                 verticalAlignment = VerticalAlignment.Bottom;
             }
-            else if (node.RowIndex == runtimeController.RowCount - 1)
+            else if (node.RowIndex == lifecycle.RowCount - 1)
             {
                 // top row
                 verticalAlignment = VerticalAlignment.Top;
@@ -141,7 +141,7 @@ namespace PlotFourVR
                 // leftmost column
                 horizontalAlignment = HorizontalAlignment.Left;
             }
-            else if (node.ColumnIndex == runtimeController.ColumnCount - 1)
+            else if (node.ColumnIndex == lifecycle.ColumnCount - 1)
             {
                 // rightmost column
                 horizontalAlignment = HorizontalAlignment.Right;

@@ -6,14 +6,14 @@ namespace PlotFourVR.UI
     public class UiMainController : MonoBehaviour
     {
         private MenuController[] menuPanels;
-        public void Initialize(RuntimeController runtimeController)
+        public void Initialize(GameLifescycleController lifecycle)
         {
             // Initialize UI elements and event listeners here
             menuPanels = GetComponentsInChildren<MenuController>(true);
 
             foreach (var panel in menuPanels)
             {
-                panel.Initialize(runtimeController);
+                panel.Initialize(lifecycle);
             }
         }
     }

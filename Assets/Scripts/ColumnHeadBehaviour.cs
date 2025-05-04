@@ -18,20 +18,20 @@ namespace PlotFourVR
 
         private Queue<Disk> diskPool;
 
-        private RuntimeController runtimeController;
+        private GameLifescycleController lifecycle;
         private Grid grid;
         private AudioSource audioSource;
 
-        public void Initialize(RuntimeController runtimeController, Grid grid, int columnIndex, int rowCount)
+        public void Initialize(GameLifescycleController lifecycle, Grid grid, int columnIndex, int rowCount)
         {
-            this.runtimeController = runtimeController;
+            this.lifecycle = lifecycle;
             this.grid = grid;
             this.columnIndex = columnIndex;
             this.rowCount = rowCount;
 
-            runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
-            runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+            lifecycle.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
+            lifecycle.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
+            lifecycle.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
 
             audioSource = GetComponent<AudioSource>();
 
@@ -51,9 +51,9 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            runtimeController.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
-            runtimeController.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
+            lifecycle.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
+            lifecycle.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
+            lifecycle.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
         }
 
         private void OnNodeHoverEntered(Node node)
@@ -87,7 +87,7 @@ namespace PlotFourVR
         private void ShowAndHighlight(Disk disk)
         {
             disk.Show();
-            NodeType type = runtimeController.CurrentState switch
+            NodeType type = lifecycle.CurrentState switch
             {
                 StateType.PlayerOneTurn => NodeType.Yellow,
                 StateType.PlayerTwoTurn => NodeType.Red,
