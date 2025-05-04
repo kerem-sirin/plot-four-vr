@@ -24,7 +24,7 @@ namespace PlotFourVR
 
         public void Build(GridModel model, GameLifescycleController lifecycle)
         {
-            float spacing = Utility.NODE_SPACING;
+            float spacing = GridLayoutService.Spacing;
             parent.position = new Vector3(-((model.ColumnCount - 1) * spacing) / 2, 0, 0);
             InstantiateColumnHeads(model, lifecycle, spacing);
             InstantiateNodes(model, lifecycle, spacing);

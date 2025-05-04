@@ -61,7 +61,6 @@ namespace PlotFourVR
             }
         }
 
-        [SerializeField] private bool isWinningNode = false; // For debugging purposes
         private void OnWinningNodeDetected(Node node)
         {
             if (this.node != node) return;

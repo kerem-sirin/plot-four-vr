@@ -3,6 +3,7 @@ using NUnit.Framework;
 using PlotFourVR.UI;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PlotFourVR
@@ -40,7 +41,7 @@ namespace PlotFourVR
             totalCount = lifecycle.RowCount * lifecycle.ColumnCount;
 
             // position parent transform at the center of the grid
-            transform.position = new Vector3(-(Mathf.RoundToInt(lifecycle.ColumnCount / 2) * Utility.NODE_SPACING), 0.5f, 2f);
+            transform.position = GridLayoutService.ComputeGridOffset(lifecycle.ColumnCount);
 
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
@@ -71,7 +72,14 @@ namespace PlotFourVR
             lifecycle.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
         }
 
-        private async void OnStateChanged(StateType state)
+        // we want keep the event handler return type as void, 
+        // so we use a Task to handle the async call
+        private void OnStateChanged(StateType state)
+        {
+            _ = HandleStateChangedAsync(state);
+        }
+
+        private async Task HandleStateChangedAsync(StateType state)
         {
             switch (state)
             {
