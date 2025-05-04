@@ -6,9 +6,11 @@ using UnityEngine.UI;
 
 namespace PlotFourVR.UI.MenuControllers
 {
+    /// <summary>
+    /// Handles the game over UI and its interactions.
+    /// </summary>
     public class GameOverPanelController : MenuController
     {
-        // This class is responsible for the game over UI and its interactions.
         [Header("Game Over Panel Properties")]
         [SerializeField] private Button playAgainButton;
         [SerializeField] private Button mainMenuButton;
@@ -21,12 +23,12 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
 
-            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.GridLayoutReady += OnGridLayoutReady;
         }
 
-        private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
+        private void OnGridLayoutReady(Vector3 vector)
         {
-            Vector3 offset = new Vector3(-0.55f, 0.75f, 0f);
+            Vector3 offset = new Vector3(-0.55f, 0.5f, 0f);
             transform.position = vector;
             transform.localPosition += offset;
         }
@@ -37,7 +39,7 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.RemoveListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
 
-            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.GridLayoutReady -= OnGridLayoutReady;
         }
 
         private void OnMainMenuButtonClicked()
@@ -77,18 +79,13 @@ namespace PlotFourVR.UI.MenuControllers
 
         private string FormatTime(float playtime)
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(playtime);
-            if (timeSpan.Hours < 1)
-            {
-                if (timeSpan.Minutes < 1)
-                {
-                    return string.Format("{0:D2}s", timeSpan.Seconds);
-                }
+            var ts = TimeSpan.FromSeconds(playtime);
 
-                return string.Format("{0:D2}m:{1:D2}s", timeSpan.Minutes, timeSpan.Seconds);
-            }
+            if (ts.Hours > 0) return $"{ts.Hours:D2}h:{ts.Minutes:D2}m:{ts.Seconds:D2}s";
 
-            return string.Format("{0:D2}h:{1:D2}m:{2:D2}s", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+            if (ts.Minutes > 0) return $"{ts.Minutes:D2}m:{ts.Seconds:D2}s";
+
+            return $"{ts.Seconds:D2}s";
         }
     }
 }

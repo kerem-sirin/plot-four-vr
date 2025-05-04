@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace PlotFourVR.UI.MenuControllers
 {
+    /// <summary>
+    /// Controller for the settings menu in the game.
+    /// </summary>
     public class SettingsMenuController : MenuController
     {
         public event Action<bool> GridSizeValidityChanged;

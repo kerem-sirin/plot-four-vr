@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace PlotFourVR.UI.SettingsListeners
 {
+    /// <summary>
+    /// Base class for settings listeners in the settings menu.
+    /// </summary>
     public abstract class SettingsListener : MonoBehaviour
     {
         SettingsMenuController settingsMenuController;

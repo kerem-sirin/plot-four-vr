@@ -7,6 +7,9 @@ using Random = UnityEngine.Random;
 
 namespace PlotFourVR.AI
 {
+    /// <summary>
+    /// Decides the next move for the AI player
+    /// </summary>
     public class AiMoveDecider
     {
         private const int MinPhaseTimeMs = 500;
@@ -41,11 +44,6 @@ namespace PlotFourVR.AI
                 await Task.Delay(remaining);
             }
             return move;
-        }
-
-        private Node PickRandom(List<Node> availableNodes)
-        {
-            return availableNodes[Random.Range(0, availableNodes.Count)];
         }
 
         private Node MakeWinningMove(List<Node> availableNodes)
@@ -148,6 +146,11 @@ namespace PlotFourVR.AI
 
             // Nothing found in or around center
             return null;
+        }
+
+        private Node PickRandom(List<Node> availableNodes)
+        {
+            return availableNodes[Random.Range(0, availableNodes.Count)];
         }
     }
 }

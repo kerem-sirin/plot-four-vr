@@ -2,6 +2,10 @@ using UnityEngine.UI;
 
 namespace PlotFourVR.UI.SettingsListeners
 {
+    /// <summary>
+    /// Manages the state of the accept button in the settings menu,
+    /// in case the grid size is valid or not.
+    /// </summary>
     public class SettingsAcceptButtonBehaviour : SettingsListener
     {
         private Button button;

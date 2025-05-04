@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace PlotFourVR.Components
 {
+    /// <summary>
+    /// Instantiates disks on top of the column, 
+    /// reveals the first disk in the queue when a player hovers a node in that column.
+    /// If the player selects the node, the disk moves to that node and removed from the queue.
+    /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class ColumnHeadBehaviour : MonoBehaviour
     {
@@ -66,7 +71,6 @@ namespace PlotFourVR.Components
             ShowAndHighlight(disk);
             PlaySfx(hoverSfx);
         }
-
 
         private void OnNodeHoverExited(Node node)
         {

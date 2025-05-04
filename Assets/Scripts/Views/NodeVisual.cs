@@ -7,6 +7,11 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace PlotFourVR.Views
 {
+    /// <summary>
+    /// Responsible for displaying the node visual in the game,
+    /// toggling interaction layers, handling hover/selection events,
+    /// depending on the game state and node state.
+    /// </summary>
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class NodeVisual : MonoBehaviour
     {

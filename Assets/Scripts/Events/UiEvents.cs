@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace PlotFourVR.Events
 {
+    /// <summary>
+    /// Handles UI events for the game.
+    /// </summary>
     public class UiEvents
     {
         public event Action<PanelType> MenuPanelRequested;
@@ -12,10 +15,10 @@ namespace PlotFourVR.Events
             MenuPanelRequested?.Invoke(menuType);
         }
 
-        public event Action<Vector3> RepositionGridRelatedMenuPositioningRequested;
-        public void RequestRepositionGridRelatedMenuPositioning(Vector3 newPosition)
+        public event Action<Vector3> GridLayoutReady;
+        public void InvokeGridLayoutReady(Vector3 newPosition)
         {
-            RepositionGridRelatedMenuPositioningRequested?.Invoke(newPosition);
+            GridLayoutReady?.Invoke(newPosition);
         }
     }
 }

@@ -3,6 +3,9 @@ using System;
 
 namespace PlotFourVR.Events
 {
+    /// <summary>
+    /// Handles interaction events for nodes in the game.
+    /// </summary>
     public class InteractionEvents
     {
         public event Action<Node> NodeHoverEntered;

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace PlotFourVR.UI.MenuControllers
 {
+    /// <summary>
+    /// Base class for all menu controllers in the game.
+    /// </summary>
     public abstract class MenuController : MonoBehaviour
     {
         [Header("Base Menu Properties")]

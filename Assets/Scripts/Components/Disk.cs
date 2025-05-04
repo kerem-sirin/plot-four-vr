@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace PlotFourVR.Components
 {
+    /// <summary>
+    /// Represents a disk in the game, which can be moved and displayed with different materials.
+    /// Instantiated and managed by the <see cref="ColumnHeadBehaviour"/> class.
+    /// </summary>
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(AudioSource))]
     public class Disk : MonoBehaviour

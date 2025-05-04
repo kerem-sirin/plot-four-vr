@@ -10,7 +10,7 @@ using UnityEngine;
 namespace PlotFourVR.Controllers
 {
     /// <summary>
-    /// Coordinates model, view, input, AI, and game rules.
+    /// Coordinates Grid related model, view, input, AI, and game rules.
     /// </summary>
     public class GridController : MonoBehaviour
     {
@@ -42,7 +42,7 @@ namespace PlotFourVR.Controllers
             totalCount = lifecycle.RowCount * lifecycle.ColumnCount;
 
             // position parent transform at the center of the grid
-            transform.position = GridLayoutService.ComputeGridOffset(lifecycle.ColumnCount);
+            transform.position = GridLayoutService.ComputeGridOffset(lifecycle.RowCount, lifecycle.ColumnCount);
 
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
@@ -52,7 +52,7 @@ namespace PlotFourVR.Controllers
                 // get the top left node, broadcast the position for menu repositioning
                 Node topLeftNode = model.GetNode(0, 0);
                 Vector3 topLeftNodePostion = view.GetTransform(topLeftNode).position;
-                lifecycle.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
+                lifecycle.EventBus.UiEvents.InvokeGridLayoutReady(topLeftNodePostion);
             });
         }
 
