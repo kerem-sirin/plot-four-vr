@@ -1,4 +1,4 @@
-# Plot Four VR 🎮🕶️
+# Plot Four VR
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#license)  
 [![Unity Version](https://img.shields.io/badge/Unity-6.6000.0.34f1-blue.svg)](#technical-details)  
@@ -15,7 +15,7 @@
 ---
 
 ##Technical Details
-Unity: 2021.3.34f1
+Unity6: 6000.0.34f1
 XR Interaction Toolkit: 3.1.1
 DOTween: 1.2.765
 Scripting Runtime: C# 8.0+
