@@ -10,10 +10,12 @@ namespace PlotFourVR
         [Header("Disk Materials")]
         [SerializeField] private Material yellowDiskMaterial;
         [SerializeField] private Material redDiskMaterial;
+        [SerializeField] private Material greenDiskMaterial;
 
         [Header("Trail Materials")]
         [SerializeField] private Material yellowTrailMaterial;
         [SerializeField] private Material redTrailMaterial;
+        [SerializeField] private Material greenTrailMaterial;
 
         private MeshRenderer meshRenderer;
         private AudioSource audioSource;
@@ -57,6 +59,11 @@ namespace PlotFourVR
             {
                 meshRenderer.material = yellowDiskMaterial;
                 trailRenderer.material = yellowTrailMaterial;
+            }
+            else if (nodeType == NodeType.Green)
+            {
+                meshRenderer.material = greenDiskMaterial;
+                trailRenderer.material = greenTrailMaterial;
             }
         }
 

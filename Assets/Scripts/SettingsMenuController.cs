@@ -14,7 +14,6 @@ namespace PlotFourVR
         [SerializeField] private SliderBehaviour widthSlider;
         [SerializeField] private SliderBehaviour heightSlider;
         [SerializeField] private SliderBehaviour winLengthSlider;
-        [SerializeField] private GameObject warningPanel;
 
         private bool isGridSizeValid = true;
         private SettingsListener[] settingsListeners;

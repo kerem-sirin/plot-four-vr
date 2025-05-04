@@ -412,8 +412,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   yellowDiskMaterial: {fileID: 2100000, guid: 43ac0965ee854924480843cd90b1a765, type: 2}
   redDiskMaterial: {fileID: 2100000, guid: 99623a1a72cd279409c41d2a94cd960d, type: 2}
+  greenDiskMaterial: {fileID: 2100000, guid: 3eef1ad3ed594b64d8881f2eda8328e0, type: 2}
   yellowTrailMaterial: {fileID: 2100000, guid: c0a7d5e0db1f1ce46a1a7800be6cf261, type: 2}
   redTrailMaterial: {fileID: 2100000, guid: e9943c3476c9ecd4e8acc9e5e16cbe83, type: 2}
+  greenTrailMaterial: {fileID: 2100000, guid: 227a887a806ff8549958e781445620aa, type: 2}
 --- !u!82 &245498613506821661
 AudioSource:
   m_ObjectHideFlags: 0

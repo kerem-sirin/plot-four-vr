@@ -48,6 +48,7 @@ MonoBehaviour:
   diskPrefab: {fileID: 5192744911389978327, guid: 028700c6640c44f42b1b76a1d8c4e9a1, type: 3}
   redHighlightMaterial: {fileID: 2100000, guid: 99623a1a72cd279409c41d2a94cd960d, type: 2}
   yellowHighlightMaterial: {fileID: 2100000, guid: 43ac0965ee854924480843cd90b1a765, type: 2}
+  greenDiskMaterial: {fileID: 2100000, guid: 3eef1ad3ed594b64d8881f2eda8328e0, type: 2}
   hoverSfx: {fileID: 8300000, guid: 0ca5e0cf15c9f1d42a90e06569d9d4c2, type: 3}
   selectSfx: {fileID: 8300000, guid: 09f999baec4261d499c8ddd62a8f1cc9, type: 3}
 --- !u!82 &547373277641094639

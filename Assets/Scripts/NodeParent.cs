@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEditor.Experimental.GraphView;
+using System.Threading.Tasks;
 
 namespace PlotFourVR
 {
@@ -14,18 +14,16 @@ namespace PlotFourVR
         [SerializeField] private Transform columnHead;
 
         private int rowCount;
+        public int ColumnCount => columnCount;
         private int columnCount;
         private int winLength;
 
-        private Vector2 mousePosition;
-
+        private DecideComputerMovement decideComputerMovement;
         private Dictionary<Node, Transform> nodeDictionary = new();
         private Dictionary<int, Transform> columnHeads = new();
 
         private StateType currentStateType;
-
         private RuntimeController runtimeController;
-
         private bool canPlayTile;
 
         public int PlayedTileCount => playedTileCount; // Number of tiles played by the player  
@@ -35,6 +33,7 @@ namespace PlotFourVR
         private float playTime = 0; // Time spent playing the game
 
         // Directions: horizontal, vertical, diag down-right, diag down-left
+        // Are used to check for winning moves
         (int dr, int dc)[] directions = {
             (0, 1),
             (1, 0),
@@ -45,6 +44,8 @@ namespace PlotFourVR
         public void Initialize(RuntimeController runtimeController)
         {
             this.runtimeController = runtimeController;
+
+            decideComputerMovement = new DecideComputerMovement(this);
 
             // Subscribe to events
             runtimeController.GameStateChanged += OnGameStateChanged;
@@ -71,12 +72,21 @@ namespace PlotFourVR
             runtimeController.EventBus.InteractionEvents.NodeInteracted -= OnNodeInteracted;
         }
 
-        private void OnGameStateChanged(StateType stateType)
+        private async void OnGameStateChanged(StateType stateType)
         {
             currentStateType = stateType;
             if(stateType is StateType.PlayerOneTurn or StateType.PlayerTwoTurn)
             {
                 canPlayTile = true;
+            }
+            else if(stateType == StateType.PlayerThreeTurn)
+            {
+                canPlayTile = true;
+                Node node = await decideComputerMovement.DecideMoveAsync();
+                runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
+                // wait for a short delay to simulate thinking time
+                await Task.Delay(400);
+                OnNodeInteracted(node);
             }
             else if (stateType == StateType.GameOver)
             {
@@ -87,29 +97,58 @@ namespace PlotFourVR
 
         private void DrawGrid()
         {
+            ResetVariables();
+
+            // position parent transform at the center of the grid
+            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount / 2) * NODE_SPACING), transform.position.y, transform.position.z);
+
+            InstantiateColumnHeadGameObjects();
+
+            InstantiateNodes();
+
+            transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
+            {
+                // Set the node parent transform to the center of the grid
+                runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+
+                // get the top left node, broadcast the position for menu repositioning
+                Node topLeftNode = GetNode(0, 0);
+                Vector3 topLeftNodePostion = GetNodeTransform(topLeftNode).position;
+                runtimeController.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
+            });
+        }
+
+        private void ResetVariables()
+        {
+            // Set grid dimensions
             rowCount = runtimeController.RowCount;
             columnCount = runtimeController.ColumnCount;
             winLength = runtimeController.WinLength;
+
+            // Reset the game state
             runtimeController.GameResult = ResultType.None;
 
+            // Clear dictionaries
             nodeDictionary.Clear();
             columnHeads.Clear();
-            // Clear existing nodes
+
+            // Clear existing game objects
             foreach (Transform child in transform)
             {
                 Destroy(child.gameObject);
             }
 
+            // Reset statistics
             // Start play time
             playTime = 0f;
             // Set total tile count
             totalTileCount = rowCount * columnCount;
             // reset played tile count
             playedTileCount = 0;
+        }
 
-            // position parent transform at the center of the grid
-            transform.position = new Vector3(-(Mathf.RoundToInt(columnCount/2) * NODE_SPACING), transform.position.y, transform.position.z);
-
+        private void InstantiateColumnHeadGameObjects()
+        {
             float columnHeadOffset = NODE_SPACING / 5f;
             // Initialize the column heads
             for (int column = 0; column < columnCount; column++)
@@ -131,7 +170,10 @@ namespace PlotFourVR
                 // Add the column head to the dictionary
                 columnHeads.Add(column, columnHeadTransform);
             }
+        }
 
+        private void InstantiateNodes()
+        {
             // Initialize the grid of nodes
             for (int row = 0; row < rowCount; row++)
             {
@@ -156,17 +198,6 @@ namespace PlotFourVR
                     nodeVisual.Initialize(runtimeController, node);
                 }
             }
-
-            transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
-            {
-                // Set the node parent transform to the center of the grid
-                runtimeController.SetCurrentState(StateType.PlayerOneTurn);
-
-                // get the top left node, broadcast the position for menu repositioning
-                Node topLeftNode = GetNode(0, 0);
-                Vector3 topLeftNodePostion = GetNodeTransform(topLeftNode).position;
-                runtimeController.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
-            });
         }
 
         private void OnNodeInteracted(Node node)
@@ -180,7 +211,14 @@ namespace PlotFourVR
             // Get the first available node in the column
             Node firstAvailableNode = GetFirstAvailableNodeInColumn(node.ColumnIndex);
             if (firstAvailableNode == null) return;
+            MarkSelectedNode(firstAvailableNode);
 
+            playedTileCount++;
+            TurnEndChecks(firstAvailableNode);
+        }
+
+        private void MarkSelectedNode(Node firstAvailableNode)
+        {
             // Set the node type to the active player's node type
             if (currentStateType == StateType.PlayerOneTurn)
             {
@@ -190,10 +228,16 @@ namespace PlotFourVR
             {
                 firstAvailableNode.NodeType = runtimeController.PlayerTwoNodeType;
             }
+            else if(currentStateType == StateType.PlayerThreeTurn)
+            {
+                firstAvailableNode.NodeType = runtimeController.PlayerThreeNodeType;
+            }
             runtimeController.EventBus.InteractionEvents.InvokeNodeTypeChanged(firstAvailableNode);
+        }
 
-            playedTileCount++;
-            // check if it is the winning move
+        private void TurnEndChecks(Node firstAvailableNode)
+        {
+            // Check if it is the winning move
             if (IsWinningMove(firstAvailableNode))
             {
                 if (currentStateType == StateType.PlayerOneTurn)
@@ -203,6 +247,10 @@ namespace PlotFourVR
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
                     runtimeController.GameResult = ResultType.PlayerTwoWin;
+                }
+                else if (currentStateType == StateType.PlayerThreeTurn)
+                {
+                    runtimeController.GameResult = ResultType.PlayerThreeWin;
                 }
                 runtimeController.SetCurrentState(StateType.GameOver);
 
@@ -218,21 +266,32 @@ namespace PlotFourVR
                 runtimeController.GameResult = ResultType.Draw;
                 runtimeController.SetCurrentState(StateType.GameOver);
             }
+            // Noone won, there are still moves left
             else
             {
-                // Switch to the other player's turn
+                // Check who played, switch to the other player's turn
                 if (currentStateType == StateType.PlayerOneTurn)
                 {
-                    runtimeController.SetCurrentState(StateType.PlayerTwoTurn);
+                    if (runtimeController.OpponentType == OpponentType.HomoSapiens)
+                    {
+                        runtimeController.SetCurrentState(StateType.PlayerTwoTurn);
+                    }
+                    else if (runtimeController.OpponentType == OpponentType.Hal9000)
+                    {
+                        runtimeController.SetCurrentState(StateType.PlayerThreeTurn);
+                    }
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
+                {
+                    runtimeController.SetCurrentState(StateType.PlayerOneTurn);
+                }
+                else if (currentStateType == StateType.PlayerThreeTurn)
                 {
                     runtimeController.SetCurrentState(StateType.PlayerOneTurn);
                 }
             }
         }
 
-        // Check if placing at (row,col) for `player` makes four in a row
         public bool IsWinningMove(Node node)
         {
             int row = node.RowIndex;
@@ -243,13 +302,13 @@ namespace PlotFourVR
             {
                 int count = 0;
                 // Slide a window from -(winLength - 1) to (winLength - 1) around the new piece
-                int slideDistance = winLength - 1; // The distance to slide the window
+                int slideDistance = winLength - 1;
                 for (int i = -slideDistance; i <= slideDistance; i++)
                 {
                     int r = row + i * dr;
                     int c = col + i * dc;
 
-                    // Check if the position is within bounds
+                    // Check if the position is within grid bounds
                     if (r >= 0 && r < rowCount && c >= 0 && c < columnCount)
                     {
                         // Check if the node is matches the player's type
@@ -260,7 +319,6 @@ namespace PlotFourVR
                             {
                                 return true;
                             }
-
                         }
                         else
                         {
@@ -302,7 +360,6 @@ namespace PlotFourVR
                             {
                                 return winningNodes;
                             }
-
                         }
                         else
                         {
@@ -334,7 +391,6 @@ namespace PlotFourVR
             {
                 return firstAvailableNode;
             }
-            Debug.LogWarning($"No available node found in column {columnIndex}");
             return null;
         }
 
@@ -364,12 +420,42 @@ namespace PlotFourVR
             return null;
         }
 
+        public List<Node> GetAvailableNodes()
+        {
+            List<Node> availableNodes = new List<Node>();
+            // for eacg column, get the first available node on the row
+            for (int column = 0; column < columnCount; column++)
+            {
+                Node firstAvailableNode = GetFirstAvailableNodeInColumn(column);
+                if (firstAvailableNode == null) continue;
+                availableNodes.Add(firstAvailableNode);
+            }
+            return availableNodes;
+        }
+
         internal void Destroy()
         {
             transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InOutCirc).OnComplete(() =>
             {
                 Destroy(gameObject);
             });
+        }
+
+        internal bool IsBelowNeighbourOccupied(Node node)
+        {
+            // Check if the node below is not empty
+            int row = node.RowIndex;
+            int col = node.ColumnIndex;
+
+            // Check if the node is at the bottom row, no need to check below
+            if (row == 0) return true;
+
+            Node belowNode = GetNode(row - 1, col);
+            if (belowNode != null && belowNode.NodeType != NodeType.Empty )
+            {
+                return true;
+            }
+            return false;
         }
     }
 
