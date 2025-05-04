@@ -5,7 +5,9 @@
 
 ![Demo](docs/demo.gif)
 
-A fully immersive VR twist on classic **Connect Four**—drop discs in 3D, face off against friends or our AI opponent, and get animated feedback every move.
+- A fully immersive VR twist on classic **Connect Four**—drop discs in 3D,
+- Play in default mode with a friend on a local network in a 9x7 grid.
+- Face off against friends or our AI opponent, and get animated feedback on every move.
 
 **On default settings** you can:
 
@@ -14,7 +16,7 @@ A fully immersive VR twist on classic **Connect Four**—drop discs in 3D, face 
 
 ---
 
-##Technical Details
+## Technical Details
 - Unity6: 6000.0.34f1
 - XR Interaction Toolkit: 3.1.1
 - DOTween: 1.2.765
