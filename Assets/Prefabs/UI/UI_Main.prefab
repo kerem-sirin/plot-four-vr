@@ -4244,6 +4244,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 784221800206897075, guid: 9d58daddf72c10547b87728e60048c57, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: ebcc4547958983b43b63a37777b693eb, type: 3}
     - target: {fileID: 784221800449296642, guid: 9d58daddf72c10547b87728e60048c57, type: 3}
       propertyPath: m_text
       value: Player
@@ -4256,6 +4260,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 18.9
       objectReference: {fileID: 0}
+    - target: {fileID: 784221801560281140, guid: 9d58daddf72c10547b87728e60048c57, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: ebcc4547958983b43b63a37777b693eb, type: 3}
     - target: {fileID: 809064763452482192, guid: 9d58daddf72c10547b87728e60048c57, type: 3}
       propertyPath: m_Options.m_Options.Array.size
       value: 2
