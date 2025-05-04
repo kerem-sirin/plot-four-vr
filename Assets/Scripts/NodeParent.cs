@@ -102,9 +102,9 @@ namespace PlotFourVR
             // position parent transform at the center of the grid
             transform.position = new Vector3(-(Mathf.RoundToInt(columnCount / 2) * NODE_SPACING), transform.position.y, transform.position.z);
 
-            InstantiateColumHeadGameObjects();
+            InstantiateColumnHeadGameObjects();
 
-            IntantiateNodes();
+            InstantiateNodes();
 
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
@@ -147,7 +147,7 @@ namespace PlotFourVR
             playedTileCount = 0;
         }
 
-        private void InstantiateColumHeadGameObjects()
+        private void InstantiateColumnHeadGameObjects()
         {
             float columnHeadOffset = NODE_SPACING / 5f;
             // Initialize the column heads
@@ -172,7 +172,7 @@ namespace PlotFourVR
             }
         }
 
-        private void IntantiateNodes()
+        private void InstantiateNodes()
         {
             // Initialize the grid of nodes
             for (int row = 0; row < rowCount; row++)

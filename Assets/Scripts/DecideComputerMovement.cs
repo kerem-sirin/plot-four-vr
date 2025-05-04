@@ -34,7 +34,7 @@ namespace PlotFourVR
             });
 
             sw.Stop();
-            // enforce a single total “think time” rather than per-phase
+            // enforce a single total "think time" rather than per-phase
             int remaining = MinPhaseTimeMs - (int)sw.ElapsedMilliseconds;
             if (remaining > 0)
             {
