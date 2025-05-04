@@ -1,5 +1,8 @@
 namespace PlotFourVR.Models
 {
+    /// <summary>
+    /// Represents a node in the grid.
+    /// </summary>
     public class Node
     {
         public Node(int rowIndex, int columnIndex, NodeType nodeType)

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace PlotFourVR.UI
 {
+    /// <summary>
+    /// Main controller for the UI, managing different menu panels and their initialization.
+    /// </summary>
     public class UiMainController : MonoBehaviour
     {
         private MenuController[] menuPanels;

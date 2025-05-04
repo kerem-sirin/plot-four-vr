@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace PlotFourVR.Helpers
 {
+    /// <summary>
+    /// Provides extension methods for converting numbers to their word representation.
+    /// </summary>
     public static class NumberExtensions
     {
         /// <summary>

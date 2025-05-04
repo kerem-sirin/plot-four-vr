@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace PlotFourVR.Events
 {
+    /// <summary>
+    /// Handles UI events for the game.
+    /// </summary>
     public class UiEvents
     {
         public event Action<PanelType> MenuPanelRequested;

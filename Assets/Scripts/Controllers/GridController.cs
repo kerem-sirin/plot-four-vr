@@ -10,7 +10,7 @@ using UnityEngine;
 namespace PlotFourVR.Controllers
 {
     /// <summary>
-    /// Coordinates model, view, input, AI, and game rules.
+    /// Coordinates Grid related model, view, input, AI, and game rules.
     /// </summary>
     public class GridController : MonoBehaviour
     {

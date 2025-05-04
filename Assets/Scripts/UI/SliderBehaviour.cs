@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace PlotFourVR.UI
 {
+    /// <summary>
+    /// Represents a slider UI element that displays its value in a text field.
+    /// </summary>
     public class SliderBehaviour : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI sliderValueText;

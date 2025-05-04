@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace PlotFourVR.UI.MenuControllers
 {
+    /// <summary>
+    /// Controls the Turn Panel in the game, that displays the current player's turn.
+    /// </summary>
     public class TurnPanelController : MenuController
     {
         [Header("Turn Panel Properties")]

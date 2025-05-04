@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace PlotFourVR.Helpers
 {
+    /// <summary>
+    /// Provides utility method(s) for calculating grid layout offsets.
+    /// </summary>
     public static class GridLayoutService
     {
         public const float Spacing = 0.2f;

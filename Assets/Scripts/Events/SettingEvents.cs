@@ -3,6 +3,9 @@ using System;
 
 namespace PlotFourVR.Events
 {
+    /// <summary>
+    /// Handles events related to game settings, such as grid size and opponent type.
+    /// </summary>
     public class SettingEvents
     {
         public event Action<int> GridWidthChanged;

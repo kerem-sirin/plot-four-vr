@@ -4,6 +4,11 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace PlotFourVR.Components
 {
+    /// <summary>
+    /// This class is responsible for displaying the right tile meshes for <see cref="Views.NodeVisual"/>
+    /// Each NodeVisual has 3 TileMesh children, center, side and corner.
+    /// When grid is created, the correct meshes are activated and the others are deactivated.
+    /// </summary>
     public class TileMesh : MonoBehaviour
     {
         [SerializeField] private TileMeshType tileMeshType;
