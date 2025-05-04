@@ -5,7 +5,7 @@
 
 ![Demo](docs/demo.gif)
 
-> A fully immersive VR twist on classic **Connect Four**—drop discs in 3D, face off against friends or our AI opponent, and get animated feedback every move.
+A fully immersive VR twist on classic **Connect Four**—drop discs in 3D, face off against friends or our AI opponent, and get animated feedback every move.
 
 **On default settings** you can:
 
@@ -20,16 +20,16 @@ XR Interaction Toolkit: 3.1.1
 DOTween: 1.2.765
 Scripting Runtime: C# 8.0+
 
-##Platform Agnostic:
+## Platform Agnostic:
 
 -The default build target is Android (Meta Quest)
 -Swap to HTC Vive, SteamVR, Samsung VR, etc. via
 -Project Settings → XR Plug-in Management → OpenXR → OpenXR Feature Groups
 
-##Acknowledgements
+## Acknowledgements
 Inspired by the classic [Connect Four](https://en.wikipedia.org/wiki/Connect_Four).
 Built with Unity XR Interaction Toolkit [(docs)](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@3.1/manual/index.html).
 Animated using [DOTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676).
 
-##License
+## License
 This project is licensed under the MIT License.
