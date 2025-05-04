@@ -1,11 +1,16 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 namespace PlotFourVR
 {
     public class DecideComputerMovement
     {
+        private const int MinPhaseTimeMs = 100;
+
         private NodeParent nodeParent;
 
         public DecideComputerMovement(NodeParent nodeParent)
@@ -13,38 +18,50 @@ namespace PlotFourVR
             this.nodeParent = nodeParent;
         }
 
-        public async Task<Node> DecideMove()
+        public async Task<Node> DecideMoveAsync()
         {
-            List<Node> availableNodes = nodeParent.GetAvailableNodes();
-            await Task.Delay(100);
-            //Win if you can
-            Node winningMove = MakeWinningMove(availableNodes);
-            if (winningMove != null) return winningMove;
+            // Run all the logic off the UI thread
+            Node result = await Task.Run(async () =>
+            {
+                var phases = new (string phaseName, Func<Node> step)[]
+                {
+                ("Checking for Win",       () => MakeWinningMove(nodeParent.GetAvailableNodes())),
+                ("Blocking Opponent Win",  () => BlockOpponentsWinningMove(nodeParent.GetAvailableNodes())),
+                ("Looking for Fork",       () => CreateFork(nodeParent.GetAvailableNodes())),
+                ("Blocking Opponent Fork", () => BlockOpponentsFork(nodeParent.GetAvailableNodes())),
+                ("Taking Center",          () => TryToTakeCenter(nodeParent.GetAvailableNodes())),
+                ("Picking Random",         () => PickRandom(nodeParent.GetAvailableNodes()))
+                };
 
-            await Task.Delay(100);
-            //Block if you can't win
-            Node winningMoveBlocker = BlockOpponentsWinningMove(availableNodes);
-            if (winningMoveBlocker != null) return winningMoveBlocker;
+                foreach (var (phaseName, step) in phases)
+                {
+                    var sw = Stopwatch.StartNew();
+                    Node move = step();
+                    sw.Stop();
 
-            await Task.Delay(100);
-            //Create a fork if there is a chance
-            Node forkMove = CreateFork(availableNodes);
-            if (forkMove != null) return forkMove;
+                    // enforce minimum delay
+                    int delay = MinPhaseTimeMs - (int)sw.ElapsedMilliseconds;
+                    if (delay > 0)
+                    {
+                        await Task.Delay(delay);
+                    }
 
-            await Task.Delay(100);
-            //Block opponent's fork if there is a chance
-            Node blockForkMove = BlockOpponentsFork(availableNodes);
-            if (blockForkMove != null) return blockForkMove;
+                    // if this phase found a move, return it immediately
+                    if (move != null)
+                    {
+                        return move;
+                    }
+                }
+                // should never hit here, but just in case
+                Debug.LogError($"No move found in any phase. Returning null.");
+                return null;
+            });
+            return result;
+        }
 
-            await Task.Delay(100);
-            //Take the center for bottom rows
-            Node centerNode = TryToTakeCenter(availableNodes);
-            if (centerNode != null) return centerNode;
-
-            // take a leap of faith and play a random move
-            await Task.Delay(100);
-            int randomIndex = Random.Range(0, availableNodes.Count);
-            return availableNodes[randomIndex];
+        private Node PickRandom(List<Node> availableNodes)
+        {
+            return availableNodes[Random.Range(0, availableNodes.Count)];
         }
 
         private Node MakeWinningMove(List<Node> availableNodes)

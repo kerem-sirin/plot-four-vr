@@ -81,7 +81,7 @@ namespace PlotFourVR
             else if(stateType == StateType.PlayerThreeTurn)
             {
                 canPlayTile = true;
-                Node node = await decideComputerMovement.DecideMove();
+                Node node = await decideComputerMovement.DecideMoveAsync();
                 runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
                 // wait for a short delay to simulate thinking time
                 await Task.Delay(400);
