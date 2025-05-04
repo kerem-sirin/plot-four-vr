@@ -52,19 +52,26 @@ namespace PlotFourVR
             foreach (Node node in availableNodes)
             {
                 // Check if placing a disc here would result in a win
-                node.NodeType = NodeType.Green;
-                if (nodeParent.IsWinningMove(node))
-                {
-                    node.NodeType = NodeType.Empty;
-                    if (nodeParent.IsBelowNeighbourOccupied(node))
-                    {
-                        // check if the below neighbour is occupied
-                        return node;
-                    }
-                    // skip the node, it'll fall below
+                if(WouldMoveSucceed(node, NodeType.Green))
+                {                  
+                    // check if the below neighbour is occupied
+                    return node;
                 }
-                // Reset the node type back to empty
-                node.NodeType = NodeType.Empty;
+            }
+            // If no winning move is found, return null
+            return null;
+        }
+
+        private Node BlockOpponentsWinningMove(List<Node> availableNodes)
+        {
+            foreach (Node node in availableNodes)
+            {
+                // Check if placing a disc here would result in a win
+                if (WouldMoveSucceed(node, NodeType.Yellow))
+                {
+                    // check if the below neighbour is occupied
+                    return node;
+                }
             }
             // If no winning move is found, return null
             return null;
@@ -76,28 +83,6 @@ namespace PlotFourVR
             bool result = nodeParent.IsBelowNeighbourOccupied(node) && nodeParent.IsWinningMove(node);
             node.NodeType = NodeType.Empty;
             return result;
-        }
-
-        private Node BlockOpponentsWinningMove(List<Node> availableNodes)
-        {
-            foreach (Node node in availableNodes)
-            {
-                // Check if placing a disc here would result in a win
-                node.NodeType = NodeType.Yellow;
-                if (nodeParent.IsWinningMove(node))
-                {
-                    node.NodeType = NodeType.Empty;
-                    if (nodeParent.IsBelowNeighbourOccupied(node))
-                    {
-                        // check if the below neighbour is occupied
-                        return node;
-                    }
-                }
-                // Reset the node type back to empty
-                node.NodeType = NodeType.Empty;
-            }
-            // If no winning move is found, return null
-            return null;
         }
 
         private Node CreateFork(List<Node> availableNodes)
@@ -162,49 +147,38 @@ namespace PlotFourVR
 
         private Node TryToTakeCenter(List<Node> availableNodes)
         {
-            int centerColumn = Mathf.FloorToInt(availableNodes.Count / 2f);
-            int acceptedDistance = Mathf.CeilToInt(availableNodes.Count / 3f);
+            // Get board width and center
+            int width = availableNodes.Count;
+            int centerCol = width / 2;
 
-            int leftOrRight = Random.Range(0, 2);
-            if(leftOrRight == 0)
+            // build a dictionary of available nodes by column
+            var nodesByCol = new Dictionary<int, List<Node>>();
+            foreach (var node in availableNodes)
             {
-                for (int i = centerColumn; i < availableNodes.Count; i++)
-                {
-                    Node node = availableNodes[i];
-                    // Try to fake intelligence with cheap, hard coded tricks and magical numbers
-                    if (node.RowIndex < 4)
-                    {
-                        // Check if the node is around the center
-                        if (i > centerColumn - acceptedDistance &&
-                            i < centerColumn + acceptedDistance)
-                        {
-                            // Reset the node type back to empty
-                            node.NodeType = NodeType.Empty;
-                            return node;
-                        }
-                    }
-                }
+                if (!nodesByCol.ContainsKey(node.ColumnIndex))
+                    nodesByCol[node.ColumnIndex] = new List<Node>();
+                nodesByCol[node.ColumnIndex].Add(node);
             }
-            else
+
+            // for each column offset 0,1,2,… try center+offset then center-offset
+            for (int offset = 0; offset <= centerCol; offset++)
             {
-                for (int i = centerColumn; i >= 0; i--)
+                foreach (int sign in new[] { +1, -1 })
                 {
-                    Node node = availableNodes[i];
-                    // Try to fake intelligence with cheap, hard coded tricks and magical numbers
-                    if (node.RowIndex < 3)
-                    {
-                        // Check if the node is around the center
-                        if (i > centerColumn - acceptedDistance &&
-                            i < centerColumn + acceptedDistance)
-                        {
-                            // Reset the node type back to empty
-                            node.NodeType = NodeType.Empty;
-                            return node;
-                        }
-                    }
+                    // move to the left or right
+                    int col = centerCol + offset * sign;
+                    if (col < 0 || col >= width) continue;
+
+                    // If we have any available nodes in this column
+                    if (!nodesByCol.TryGetValue(col, out List<Node> colNodes)) continue;
+                    if (colNodes[0] != null) return colNodes[0];
                 }
+
+                // Special case: when offset == 0, we tried center twice (+ and –). Skip duplicate.
+                if (offset == 0) continue;
             }
-            // If no center move is found, return null
+
+            // Nothing found in or around center
             return null;
         }
     }

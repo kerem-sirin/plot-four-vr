@@ -390,7 +390,6 @@ namespace PlotFourVR
             {
                 return firstAvailableNode;
             }
-            Debug.LogWarning($"No available node found in column {columnIndex}");
             return null;
         }
 
@@ -427,10 +426,8 @@ namespace PlotFourVR
             for (int column = 0; column < columnCount; column++)
             {
                 Node firstAvailableNode = GetFirstAvailableNodeInColumn(column);
-                if (firstAvailableNode != null)
-                {
-                    availableNodes.Add(firstAvailableNode);
-                }
+                if (firstAvailableNode == null) continue;
+                availableNodes.Add(firstAvailableNode);
             }
             return availableNodes;
         }
