@@ -48,7 +48,7 @@ namespace PlotFourVR
             RowCount = DEFAULT_GRID_HEIGHT;
             ColumnCount = DEFAULT_GRID_WIDTH;
             WinLength = DEFAULT_WIN_LENGTH;
-            OpponentType = OpponentType.Hal9000;
+            OpponentType = OpponentType.HomoSapiens;
         }
 
         private void Start()

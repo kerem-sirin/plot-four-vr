@@ -44,14 +44,14 @@ namespace PlotFourVR
         {
             this.runtimeController = runtimeController;
 
+            decideComputerMovement = new DecideComputerMovement(this);
+
             // Subscribe to events
             runtimeController.GameStateChanged += OnGameStateChanged;
             runtimeController.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;
 
             // Draw the grid
             DrawGrid();
-
-            decideComputerMovement = new DecideComputerMovement(this, nodeDictionary);
         }
 
         private void Update()
@@ -80,7 +80,6 @@ namespace PlotFourVR
             }
             else if(stateType == StateType.PlayerThreeTurn)
             {
-                print("AI is playing");
                 canPlayTile = true;
                 Node node = await decideComputerMovement.DecideMove();
                 runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
