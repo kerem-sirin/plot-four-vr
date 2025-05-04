@@ -9,7 +9,6 @@ namespace PlotFourVR
     public class DecideComputerMovement
     {
         private const int MinPhaseTimeMs = 100;
-
         private NodeParent nodeParent;
 
         public DecideComputerMovement(NodeParent nodeParent)
@@ -40,7 +39,6 @@ namespace PlotFourVR
             {
                 await Task.Delay(remaining);
             }
-
             return move;
         }
 

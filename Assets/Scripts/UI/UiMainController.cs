@@ -16,4 +16,15 @@ namespace PlotFourVR
             }
         }
     }
+
+    public enum PanelType
+    {
+        MainMenu,
+        SettingsMenu,
+        YellowTurnMenu,
+        RedTurnMenu,
+        GameOverMenu,
+        None,
+        GreenTurnMenu,
+    }
 }

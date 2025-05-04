@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Events
 {
     public class UiEvents
     {
@@ -16,16 +16,5 @@ namespace PlotFourVR
         {
             RepositionGridRelatedMenuPositioningRequested?.Invoke(newPosition);
         }
-    }
-    
-    public enum PanelType
-    {
-        MainMenu,
-        SettingsMenu,
-        YellowTurnMenu,
-        RedTurnMenu,
-        GameOverMenu,
-        None,
-        GreenTurnMenu,
     }
 }

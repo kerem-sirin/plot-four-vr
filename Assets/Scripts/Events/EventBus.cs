@@ -1,4 +1,4 @@
-namespace PlotFourVR
+namespace PlotFourVR.Events
 {
     public class EventBus
     {
