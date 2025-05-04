@@ -26,7 +26,7 @@ namespace PlotFourVR.UI.MenuControllers
 
         private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
         {
-            Vector3 offset = new Vector3(-0.55f, 0.75f, 0f);
+            Vector3 offset = new Vector3(-0.55f, 0.5f, 0f);
             transform.position = vector;
             transform.localPosition += offset;
         }

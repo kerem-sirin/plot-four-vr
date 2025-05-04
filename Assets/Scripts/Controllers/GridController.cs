@@ -42,7 +42,7 @@ namespace PlotFourVR.Controllers
             totalCount = lifecycle.RowCount * lifecycle.ColumnCount;
 
             // position parent transform at the center of the grid
-            transform.position = GridLayoutService.ComputeGridOffset(lifecycle.ColumnCount);
+            transform.position = GridLayoutService.ComputeGridOffset(lifecycle.RowCount, lifecycle.ColumnCount);
 
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
