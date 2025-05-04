@@ -459,21 +459,4 @@ namespace PlotFourVR
             return false;
         }
     }
-
-    [Serializable]
-    public class Node
-    {
-        public Node(int rowIndex, int columnIndex, NodeType nodeType)
-        {
-            this.rowIndex = rowIndex;
-            this.columnIndex = columnIndex;
-            this.nodeType = nodeType;
-        }
-        public int RowIndex => rowIndex;
-        [SerializeField] private int rowIndex;
-        public int ColumnIndex => columnIndex;
-        [SerializeField] private int columnIndex;
-        public NodeType NodeType { get => nodeType; set => nodeType = value;}
-        [SerializeField] private NodeType nodeType;
-    }
 }
