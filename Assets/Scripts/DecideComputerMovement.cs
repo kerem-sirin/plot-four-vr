@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Random = UnityEngine.Random;
 
@@ -20,16 +21,16 @@ namespace PlotFourVR
         {
             var sw = Stopwatch.StartNew();
 
+            var availableNodes = nodeParent.GetAvailableNodes();
             // Run all decision logic synchronously on a background thread
             Node move = await Task.Run(() =>
             {
-                var avail = nodeParent.GetAvailableNodes();
-                if (MakeWinningMove(avail) is Node win) return win;
-                if (BlockOpponentsWinningMove(avail) is Node blk) return blk;
-                if (CreateFork(avail) is Node fork) return fork;
-                if (BlockOpponentsFork(avail) is Node bfork) return bfork;
-                if (TryToTakeCenter(avail) is Node center) return center;
-                return PickRandom(avail);
+                if (MakeWinningMove(availableNodes) is Node win) return win;
+                if (BlockOpponentsWinningMove(availableNodes) is Node blk) return blk;
+                if (CreateFork(availableNodes) is Node fork) return fork;
+                if (BlockOpponentsFork(availableNodes) is Node bfork) return bfork;
+                if (TryToTakeCenter(availableNodes) is Node center) return center;
+                return PickRandom(availableNodes);
             });
 
             sw.Stop();
@@ -88,62 +89,29 @@ namespace PlotFourVR
 
         private Node CreateFork(List<Node> availableNodes)
         {
-            foreach (Node node in availableNodes)
-            {
-                // Check if placing a disc here would create a fork
-                node.NodeType = NodeType.Green;
-
-                // Get the remaining available nodes
-                foreach (Node nextNode in availableNodes)
-                {
-                    nextNode.NodeType = NodeType.Green;
-                    if (nodeParent.IsWinningMove(nextNode))
-                    {
-                        node.NodeType = NodeType.Empty;
-                        nextNode.NodeType = NodeType.Empty;
-                        if (nodeParent.IsBelowNeighbourOccupied(node))
-                        {
-                            // Reset the node type back to empty
-                            return node;
-                        }
-                    }
-                    nextNode.NodeType = NodeType.Empty;
-                }
-                // Reset the node type back to empty
-                node.NodeType = NodeType.Empty;
-            }
-            // If no fork is found, return null
-            return null;
+            return availableNodes.FirstOrDefault(n => Fork(n, NodeType.Green));
         }
 
         private Node BlockOpponentsFork(List<Node> availableNodes)
         {
-            foreach (Node node in availableNodes)
-            {
-                // Check if placing a disc here would create a fork
-                node.NodeType = NodeType.Yellow;
+            return availableNodes.FirstOrDefault(n => Fork(n, NodeType.Yellow));
+        }
 
-                // Get the remaining available nodes
-                foreach (Node nextNode in availableNodes)
-                {
-                    nextNode.NodeType = NodeType.Yellow;
-                    if (nodeParent.IsWinningMove(nextNode))
-                    {
-                        node.NodeType = NodeType.Empty;
-                        nextNode.NodeType = NodeType.Empty;
-                        if (nodeParent.IsBelowNeighbourOccupied(node))
-                        {
-                            // Reset the node type back to empty
-                            return node;
-                        }
-                    }
-                    nextNode.NodeType = NodeType.Empty;
-                }
-                // Reset the node type back to empty
-                node.NodeType = NodeType.Empty;
+        private bool Fork(Node n, NodeType color)
+        {
+            if (!nodeParent.IsBelowNeighbourOccupied(n)) return false;
+            n.NodeType = color;
+            int threats = 0;
+            foreach (var next in nodeParent.GetAvailableNodes())
+            {
+                if (!nodeParent.IsBelowNeighbourOccupied(next)) continue;
+                next.NodeType = color;
+                if (nodeParent.IsWinningMove(next)) threats++;
+                next.NodeType = NodeType.Empty;
+                if (threats >= 2) break;
             }
-            // If no fork is found, return null
-            return null;
+            n.NodeType = NodeType.Empty;
+            return threats >= 2;
         }
 
         private Node TryToTakeCenter(List<Node> availableNodes)
