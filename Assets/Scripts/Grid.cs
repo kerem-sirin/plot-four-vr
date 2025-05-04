@@ -108,8 +108,8 @@ namespace PlotFourVR
 
             transform.DOScale(Vector3.one, 1f).SetEase(Ease.OutBack).OnComplete(() =>
             {
-                // Set the node parent transform to the center of the grid
-                lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
+                // fire the event to change state
+                _ = lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
 
                 // get the top left node, broadcast the position for menu repositioning
                 Node topLeftNode = GetNode(0, 0);
@@ -252,7 +252,7 @@ namespace PlotFourVR
                 {
                     lifecycle.GameResult = ResultType.PlayerThreeWin;
                 }
-                lifecycle.SetGameStateAsync(StateType.GameOver);
+                _ = lifecycle.SetGameStateAsync(StateType.GameOver);
 
                 // Enable Vfx for winning Nodes
                 foreach (Node winningNode in GetWinningTiles(firstAvailableNode))
@@ -264,7 +264,7 @@ namespace PlotFourVR
             else if (playedTileCount >= totalTileCount)
             {
                 lifecycle.GameResult = ResultType.Draw;
-                lifecycle.SetGameStateAsync(StateType.GameOver);
+                _ = lifecycle.SetGameStateAsync(StateType.GameOver);
             }
             // Noone won, there are still moves left
             else
@@ -274,20 +274,20 @@ namespace PlotFourVR
                 {
                     if (lifecycle.OpponentType == OpponentType.HomoSapiens)
                     {
-                        lifecycle.SetGameStateAsync(StateType.PlayerTwoTurn);
+                        _ = lifecycle.SetGameStateAsync(StateType.PlayerTwoTurn);
                     }
                     else if (lifecycle.OpponentType == OpponentType.Hal9000)
                     {
-                        lifecycle.SetGameStateAsync(StateType.PlayerThreeTurn);
+                        _ = lifecycle.SetGameStateAsync(StateType.PlayerThreeTurn);
                     }
                 }
                 else if (currentStateType == StateType.PlayerTwoTurn)
                 {
-                    lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
+                    _ = lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
                 }
                 else if (currentStateType == StateType.PlayerThreeTurn)
                 {
-                    lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
+                    _ = lifecycle.SetGameStateAsync(StateType.PlayerOneTurn);
                 }
             }
         }

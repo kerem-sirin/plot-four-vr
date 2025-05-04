@@ -41,12 +41,12 @@ namespace PlotFourVR.UI.MenuControllers
 
         private void OnMainMenuButtonClicked()
         {
-            lifecycle.SetGameStateAsync(StateType.EndingCurrentGame);
+            _ = lifecycle.SetGameStateAsync(StateType.EndingCurrentGame);
         }
 
         private void OnPlayAgainButtonClicked()
         {
-            lifecycle.SetGameStateAsync(StateType.GameStarting);
+            _ = lifecycle.SetGameStateAsync(StateType.GameStarting);
         }
 
         protected override void PanelEnabled()

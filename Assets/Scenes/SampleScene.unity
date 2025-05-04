@@ -937,7 +937,7 @@ GameObject:
   - component: {fileID: 1665983187}
   - component: {fileID: 1665983186}
   m_Layer: 0
-  m_Name: RuntimeController
+  m_Name: GameLifescycleController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
