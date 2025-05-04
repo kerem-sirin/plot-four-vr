@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI.MenuControllers
 {
     public abstract class MenuController : MonoBehaviour
     {

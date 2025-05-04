@@ -1,6 +1,6 @@
 using System;
 
-namespace PlotFourVR
+namespace PlotFourVR.Events
 {
     public class InteractionEvents
     {

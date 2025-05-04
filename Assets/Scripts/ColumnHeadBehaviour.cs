@@ -3,15 +3,11 @@ using UnityEngine;
 
 namespace PlotFourVR
 {
+    [RequireComponent(typeof(AudioSource))]
     public class ColumnHeadBehaviour : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private Transform diskPrefab;
-
-        [Header("Materials")]
-        [SerializeField] private Material redHighlightMaterial;
-        [SerializeField] private Material yellowHighlightMaterial;
-        [SerializeField] private Material greenDiskMaterial;
 
         [Header("Sfx")]
         [SerializeField] private AudioClip hoverSfx;
@@ -20,16 +16,16 @@ namespace PlotFourVR
         private int columnIndex; // The index of the column this head belongs to
         private int rowCount; // The number of rows in the grid
 
-        private List<NodeDisk> nodeDisks;
+        private Queue<Disk> diskPool;
 
         private RuntimeController runtimeController;
-        private NodeParent nodeParent;
+        private Grid grid;
         private AudioSource audioSource;
 
-        public void Initialize(RuntimeController runtimeController, NodeParent nodeParent, int columnIndex, int rowCount)
+        public void Initialize(RuntimeController runtimeController, Grid grid, int columnIndex, int rowCount)
         {
             this.runtimeController = runtimeController;
-            this.nodeParent = nodeParent;
+            this.grid = grid;
             this.columnIndex = columnIndex;
             this.rowCount = rowCount;
 
@@ -39,13 +35,17 @@ namespace PlotFourVR
 
             audioSource = GetComponent<AudioSource>();
 
-            // create disk pool 
-            nodeDisks = new List<NodeDisk>(this.rowCount);
-            for (int i = 0; i < this.rowCount; i++)
+            SetupDiskPool();
+        }
+
+        private void SetupDiskPool()
+        {
+            diskPool = new Queue<Disk>(rowCount);
+            for (int i = 0; i < rowCount; i++)
             {
-                NodeDisk disk = Instantiate(diskPrefab, transform).GetComponent<NodeDisk>();
+                var disk = Instantiate(diskPrefab, transform).GetComponent<Disk>();
                 disk.Hide();
-                nodeDisks.Add(disk);
+                diskPool.Enqueue(disk);
             }
         }
 
@@ -58,69 +58,49 @@ namespace PlotFourVR
 
         private void OnNodeHoverEntered(Node node)
         {
-            if (node.ColumnIndex != columnIndex) return;
-
-            // get the first disk from the queue
-            if (nodeDisks.Count == 0)
-            {
-                Debug.LogWarning($"No disks available to highlight for pos: r{node.RowIndex}-c{node.ColumnIndex}");
-                return;
-            }
-            ShowDiskAndSetMaterial(nodeDisks[0]);
+            if (node.ColumnIndex != columnIndex || diskPool.Count == 0) return;
+            Disk disk = diskPool.Peek();
+            ShowAndHighlight(disk);
             PlaySfx(hoverSfx);
         }
 
+
         private void OnNodeHoverExited(Node node)
         {
-            if (node.ColumnIndex != columnIndex) return;
-
-            // defensive check for the last disk, that is not going to be hidden
-            if (nodeDisks.Count == 0) return;
-            nodeDisks[0].Hide();
+            if (node.ColumnIndex != columnIndex || diskPool.Count == 0) return;
+            diskPool.Peek().Hide();
         }
 
         private void OnNodeTypeChanged(Node node)
         {
-            if (node.ColumnIndex != columnIndex) return;
+            if (node.ColumnIndex != columnIndex || diskPool.Count == 0) return;
 
-            // move the disk to the node position
-            Vector3 targetPosition = nodeParent.GetNodeTransform(node).position;
+            Disk disk = diskPool.Dequeue();
+            Vector3 targetPos = grid.GetNodeTransform(node).position;
+            ShowAndHighlight(disk);
 
-            if (nodeDisks.Count == 0)
-            {
-                Debug.LogWarning($"No disks available to move for pos: r{node.RowIndex}-c{node.ColumnIndex}");
-                return;
-            }
-            ShowDiskAndSetMaterial(nodeDisks[0]);
-            // normalize the distance as row index
-            float normalizedIndexDistance = ((float)(rowCount - node.RowIndex) / rowCount);
-            nodeDisks[0].MoveToSlot(targetPosition, normalizedIndexDistance);
-            nodeDisks.RemoveAt(0);
+            float volume = Mathf.Clamp01((float)(rowCount - node.RowIndex) / rowCount);
+            disk.MoveToSlot(targetPos, volume);
+            PlaySfx(selectSfx);
         }
 
-        private void ShowDiskAndSetMaterial(NodeDisk nodeDisk)
+        private void ShowAndHighlight(Disk disk)
         {
-            nodeDisk.Show();
-            // Set the highlight material depending on the player turn
-            if (runtimeController.CurrentState == StateType.PlayerOneTurn)
+            disk.Show();
+            NodeType type = runtimeController.CurrentState switch
             {
-                nodeDisk.SetMaterial(NodeType.Yellow);
-            }
-            else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
-            {
-                nodeDisk.SetMaterial(NodeType.Red);
-            }
-            else if (runtimeController.CurrentState == StateType.PlayerThreeTurn)
-            {
-                nodeDisk.SetMaterial(NodeType.Green);
-            }
+                StateType.PlayerOneTurn => NodeType.Yellow,
+                StateType.PlayerTwoTurn => NodeType.Red,
+                StateType.PlayerThreeTurn => NodeType.Green,
+                _ => NodeType.Green
+            };
+            disk.SetMaterial(type);
         }
 
         private void PlaySfx(AudioClip audioClip)
         {
             audioSource.pitch = Random.Range(0.9f, 1.3f);
             audioSource.volume = Random.Range(0.8f, 1.0f);
-
             audioSource.PlayOneShot(audioClip);
         }
     }

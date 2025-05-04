@@ -2,13 +2,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI.MenuControllers
 {
     public class MainMenuController : MenuController
     {
         // This class is responsible for the main menu UI and its interactions.
         // It inherits from MenuController, which handles common menu functionalities.
-
         [Header("Settings Menu Properties")]
         [SerializeField] private Button playButton;
         [SerializeField] private Button settingsButton;

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -101,7 +100,6 @@ namespace PlotFourVR
         {
             // Show the node disk at the column head position
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
-
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)

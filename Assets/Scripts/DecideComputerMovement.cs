@@ -9,19 +9,18 @@ namespace PlotFourVR
     public class DecideComputerMovement
     {
         private const int MinPhaseTimeMs = 100;
+        private Grid grid;
 
-        private NodeParent nodeParent;
-
-        public DecideComputerMovement(NodeParent nodeParent)
+        public DecideComputerMovement(Grid grid)
         {
-            this.nodeParent = nodeParent;
+            this.grid = grid;
         }
 
         public async Task<Node> DecideMoveAsync()
         {
             var sw = Stopwatch.StartNew();
 
-            var availableNodes = nodeParent.GetAvailableNodes();
+            var availableNodes = grid.GetAvailableNodes();
             // Run all decision logic synchronously on a background thread
             Node move = await Task.Run(() =>
             {
@@ -40,7 +39,6 @@ namespace PlotFourVR
             {
                 await Task.Delay(remaining);
             }
-
             return move;
         }
 
@@ -82,7 +80,7 @@ namespace PlotFourVR
         private bool WouldMoveSucceed(Node node, NodeType testType)
         {
             node.NodeType = testType;
-            bool result = nodeParent.IsBelowNeighbourOccupied(node) && nodeParent.IsWinningMove(node);
+            bool result = grid.IsBelowNeighbourOccupied(node) && grid.IsWinningMove(node);
             node.NodeType = NodeType.Empty;
             return result;
         }
@@ -99,14 +97,14 @@ namespace PlotFourVR
 
         private bool Fork(Node n, NodeType color)
         {
-            if (!nodeParent.IsBelowNeighbourOccupied(n)) return false;
+            if (!grid.IsBelowNeighbourOccupied(n)) return false;
             n.NodeType = color;
             int threats = 0;
-            foreach (var next in nodeParent.GetAvailableNodes())
+            foreach (var next in grid.GetAvailableNodes())
             {
-                if (!nodeParent.IsBelowNeighbourOccupied(next)) continue;
+                if (!grid.IsBelowNeighbourOccupied(next)) continue;
                 next.NodeType = color;
-                if (nodeParent.IsWinningMove(next)) threats++;
+                if (grid.IsWinningMove(next)) threats++;
                 next.NodeType = NodeType.Empty;
                 if (threats >= 2) break;
             }
@@ -117,7 +115,7 @@ namespace PlotFourVR
         private Node TryToTakeCenter(List<Node> availableNodes)
         {
             // Get board width and center
-            int width = nodeParent.ColumnCount;
+            int width = grid.ColumnCount;
             int centerCol = width / 2;
 
             // build a dictionary of available nodes by column

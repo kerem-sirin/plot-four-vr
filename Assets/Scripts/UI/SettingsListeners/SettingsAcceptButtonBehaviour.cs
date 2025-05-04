@@ -1,6 +1,6 @@
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI.SettingsListeners
 {
     public class SettingsAcceptButtonBehaviour : SettingsListener
     {

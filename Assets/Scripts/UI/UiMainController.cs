@@ -1,6 +1,7 @@
+using PlotFourVR.UI.MenuControllers;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI
 {
     public class UiMainController : MonoBehaviour
     {
@@ -15,5 +16,16 @@ namespace PlotFourVR
                 panel.Initialize(runtimeController);
             }
         }
+    }
+
+    public enum PanelType
+    {
+        MainMenu,
+        SettingsMenu,
+        YellowTurnMenu,
+        RedTurnMenu,
+        GameOverMenu,
+        None,
+        GreenTurnMenu,
     }
 }

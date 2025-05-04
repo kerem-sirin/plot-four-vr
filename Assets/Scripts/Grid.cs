@@ -1,12 +1,12 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Threading.Tasks;
+using PlotFourVR.UI;
 
 namespace PlotFourVR
 {
-    public class NodeParent : MonoBehaviour
+    public class Grid : MonoBehaviour
     {
         private const float NODE_SPACING = 0.2f; // Space between nodes
 
@@ -457,22 +457,5 @@ namespace PlotFourVR
             }
             return false;
         }
-    }
-
-    [Serializable]
-    public class Node
-    {
-        public Node(int rowIndex, int columnIndex, NodeType nodeType)
-        {
-            this.rowIndex = rowIndex;
-            this.columnIndex = columnIndex;
-            this.nodeType = nodeType;
-        }
-        public int RowIndex => rowIndex;
-        [SerializeField] private int rowIndex;
-        public int ColumnIndex => columnIndex;
-        [SerializeField] private int columnIndex;
-        public NodeType NodeType { get => nodeType; set => nodeType = value;}
-        [SerializeField] private NodeType nodeType;
     }
 }

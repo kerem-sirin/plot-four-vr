@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI.MenuControllers
 {
     public class GameOverPanelController : MenuController
     {
@@ -70,8 +70,8 @@ namespace PlotFourVR
                 resultText.SetText("It's a Draw!");
             }
 
-            tilesPlayedText.SetText(runtimeController.NodeParent.PlayedTileCount.ToString());
-            playTimeText.SetText(FormatTime(runtimeController.NodeParent.PlayTime));
+            tilesPlayedText.SetText(runtimeController.Grid.PlayedTileCount.ToString());
+            playTimeText.SetText(FormatTime(runtimeController.Grid.PlayTime));
         }
 
         private string FormatTime(float playtime)
