@@ -1,3 +1,5 @@
+using PlotFourVR.Controllers;
+using PlotFourVR.Helpers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,16 +25,16 @@ namespace PlotFourVR.UI.MenuControllers
             settingsButton.onClick.AddListener(OnSettingsButtonClicked);
 
             // subscribe to events to update the UI
-            runtimeController.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
-            runtimeController.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
-            runtimeController.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+            lifecycle.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
+            lifecycle.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
+            lifecycle.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
 
             opponentTypeDropdownMenu.onValueChanged.AddListener(OnOpponentTypeChanged);
 
             // Set the initial values for the UI elements
-            widthInfoText.SetText(runtimeController.ColumnCount.ToString());
-            heightInfoText.SetText($"x {runtimeController.RowCount.ToString()}");
-            winLengthInfoText.SetText($"{runtimeController.WinLength.ToString()} Tiles");
+            widthInfoText.SetText(lifecycle.ColumnCount.ToString());
+            heightInfoText.SetText($"x {lifecycle.RowCount.ToString()}");
+            winLengthInfoText.SetText($"{lifecycle.WinLength.ToString()} Tiles");
         }
 
         protected override void OnDestroy()
@@ -44,29 +46,29 @@ namespace PlotFourVR.UI.MenuControllers
             opponentTypeDropdownMenu.onValueChanged.RemoveListener(OnOpponentTypeChanged);
 
             // unsubscribe from events
-            runtimeController.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
-            runtimeController.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
-            runtimeController.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
+            lifecycle.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
+            lifecycle.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
+            lifecycle.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
         }
 
         private void OnPlayButtonClicked()
         {
             // Handle play button click
-            runtimeController.SetCurrentState(StateType.GameStarting);
+            _ = lifecycle.SetGameStateAsync(StateType.GameStarting);
             PanelDisabled();
         }
 
         private void OnSettingsButtonClicked()
         {
             // Handle settings button click
-            runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
+            lifecycle.EventBus.UiEvents.RequestMenuPanel(PanelType.SettingsMenu);
         }
 
         private void OnOpponentTypeChanged(int arg0)
         {
             // publish the event to change the opponent type
             OpponentType opponentType = (OpponentType)arg0;
-            runtimeController.EventBus.SettingEvents.InvokeOpponentTypeChanged(opponentType);
+            lifecycle.EventBus.SettingEvents.InvokeOpponentTypeChanged(opponentType);
         }
 
         private void OnGridWidthChanged(int obj)
@@ -81,7 +83,7 @@ namespace PlotFourVR.UI.MenuControllers
 
         private void OnWinLengthChanged(int obj)
         {
-            headerText.SetText($"Plot {Utility.NumberToText(obj)} VR");
+            headerText.SetText($"Plot {NumberExtensions.ToWords(obj)} VR");
             winLengthInfoText.SetText($"{obj.ToString()} Tiles");
         }
     }

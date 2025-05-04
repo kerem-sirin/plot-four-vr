@@ -1,3 +1,4 @@
+using PlotFourVR.Controllers;
 using UnityEngine;
 
 namespace PlotFourVR.UI.MenuControllers
@@ -9,9 +10,9 @@ namespace PlotFourVR.UI.MenuControllers
 
         protected override void Initialize()
         {
-            runtimeController.GameStateChanged += OnGameStateChanged;
+            lifecycle.GameStateChanged += OnGameStateChanged;
 
-            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 newPosition)
@@ -24,9 +25,9 @@ namespace PlotFourVR.UI.MenuControllers
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            runtimeController.GameStateChanged -= OnGameStateChanged;
+            lifecycle.GameStateChanged -= OnGameStateChanged;
 
-            runtimeController.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
         }
 
         private void OnGameStateChanged(StateType newState)

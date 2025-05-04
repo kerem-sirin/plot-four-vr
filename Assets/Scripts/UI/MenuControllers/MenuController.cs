@@ -1,4 +1,5 @@
 using DG.Tweening;
+using PlotFourVR.Controllers;
 using UnityEngine;
 
 namespace PlotFourVR.UI.MenuControllers
@@ -11,13 +12,13 @@ namespace PlotFourVR.UI.MenuControllers
 
         protected CanvasGroup parentCanvasGroup;  
 
-        protected RuntimeController runtimeController;
+        protected GameLifecycleController lifecycle;
 
-        internal virtual void Initialize(RuntimeController runtimeController)
+        internal virtual void Initialize(GameLifecycleController lifecycle)
         {
-            this.runtimeController = runtimeController;
+            this.lifecycle = lifecycle;
 
-            this.runtimeController.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
+            this.lifecycle.EventBus.UiEvents.MenuPanelRequested += OnMenuPanelRequested;
             parentCanvasGroup = parent.GetComponent<CanvasGroup>();
 
             Initialize();
@@ -27,7 +28,7 @@ namespace PlotFourVR.UI.MenuControllers
 
         protected virtual void OnDestroy()
         {
-            runtimeController.EventBus.UiEvents.MenuPanelRequested -= OnMenuPanelRequested;
+            lifecycle.EventBus.UiEvents.MenuPanelRequested -= OnMenuPanelRequested;
         }
 
         private void OnMenuPanelRequested(PanelType requestedMenuType)

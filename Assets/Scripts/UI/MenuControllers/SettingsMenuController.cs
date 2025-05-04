@@ -29,14 +29,14 @@ namespace PlotFourVR.UI.MenuControllers
             winLengthSlider.Slider.onValueChanged.AddListener(OnWinLengthSliderValueChanged);
 
             // subscribe to events to update the UI
-            runtimeController.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
-            runtimeController.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
-            runtimeController.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
+            lifecycle.EventBus.SettingEvents.GridWidthChanged += OnGridWidthChanged;
+            lifecycle.EventBus.SettingEvents.GridHeightChanged += OnGridHeightChanged;
+            lifecycle.EventBus.SettingEvents.WinLengthChanged += OnWinLengthChanged;
 
             // Set the initial values for the UI elements
-            widthSlider.Slider.value = runtimeController.ColumnCount;
-            heightSlider.Slider.value = runtimeController.RowCount;
-            winLengthSlider.Slider.value = runtimeController.WinLength;
+            widthSlider.Slider.value = lifecycle.ColumnCount;
+            heightSlider.Slider.value = lifecycle.RowCount;
+            winLengthSlider.Slider.value = lifecycle.WinLength;
 
             settingsListeners = GetComponentsInChildren<SettingsListener>();
             foreach (var listener in settingsListeners)
@@ -57,22 +57,22 @@ namespace PlotFourVR.UI.MenuControllers
             winLengthSlider.Slider.onValueChanged.RemoveListener(OnWinLengthSliderValueChanged);
 
             // unsubscribe from events
-            runtimeController.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
-            runtimeController.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
-            runtimeController.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
+            lifecycle.EventBus.SettingEvents.GridWidthChanged -= OnGridWidthChanged;
+            lifecycle.EventBus.SettingEvents.GridHeightChanged -= OnGridHeightChanged;
+            lifecycle.EventBus.SettingEvents.WinLengthChanged -= OnWinLengthChanged;
         }
 
         private void OnAcceptButtonClicked()
         {
-            runtimeController.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
+            lifecycle.EventBus.UiEvents.RequestMenuPanel(PanelType.MainMenu);
             PanelDisabled();
         }
 
         private void OnResetToDefaultValuesButtonClicked()
         {
-            runtimeController.EventBus.SettingEvents.InvokeGridWidthChanged(9);
-            runtimeController.EventBus.SettingEvents.InvokeGridHeightChanged(7);
-            runtimeController.EventBus.SettingEvents.InvokeWinLengthChanged(4);
+            lifecycle.EventBus.SettingEvents.InvokeGridWidthChanged(9);
+            lifecycle.EventBus.SettingEvents.InvokeGridHeightChanged(7);
+            lifecycle.EventBus.SettingEvents.InvokeWinLengthChanged(4);
         }
 
         private void OnGridWidthChanged(int obj)
@@ -95,25 +95,25 @@ namespace PlotFourVR.UI.MenuControllers
         private void OnWidthSliderValueChanged(float arg0)
         {
             int width = (int)widthSlider.Slider.value;
-            runtimeController.EventBus.SettingEvents.InvokeGridWidthChanged(width);
+            lifecycle.EventBus.SettingEvents.InvokeGridWidthChanged(width);
         }
 
         private void OnHeightSliderValueChanged(float arg0)
         {
             int height = (int)heightSlider.Slider.value;
-            runtimeController.EventBus.SettingEvents.InvokeGridHeightChanged(height);
+            lifecycle.EventBus.SettingEvents.InvokeGridHeightChanged(height);
         }
 
         private void OnWinLengthSliderValueChanged(float arg0)
         {
             int winLength = (int)winLengthSlider.Slider.value;
-            runtimeController.EventBus.SettingEvents.InvokeWinLengthChanged(winLength);
+            lifecycle.EventBus.SettingEvents.InvokeWinLengthChanged(winLength);
         }
 
         private void CheckGridSizeValidity()
         {
             // Check if the grid size is valid
-            bool isValid = runtimeController.IsGridSizeValid();
+            bool isValid = lifecycle.IsGridSizeValid();
             if (isValid != isGridSizeValid)
             {
                 // if the grid size validity changes, fire event

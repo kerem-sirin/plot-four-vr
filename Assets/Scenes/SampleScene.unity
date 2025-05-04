@@ -937,7 +937,7 @@ GameObject:
   - component: {fileID: 1665983187}
   - component: {fileID: 1665983186}
   m_Layer: 0
-  m_Name: RuntimeController
+  m_Name: GameLifecycleController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -952,7 +952,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1665983185}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c959717f743ae24db814da9d9958113, type: 3}
+  m_Script: {fileID: 11500000, guid: c277577b8fc489646914fd9839348842, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gridPrefab: {fileID: 5463865134415908064, guid: acbdf3fdef1192d4d991e45fbe88c33a, type: 3}

@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dadd12e301e441f4f92a33b9fd7538cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isWinningNode: 0
 --- !u!114 &3375645270189925277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,7 +235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4133923459530055513
 Transform:
   m_ObjectHideFlags: 0
@@ -267,7 +268,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:

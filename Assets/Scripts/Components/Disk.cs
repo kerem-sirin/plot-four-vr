@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Components
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(AudioSource))]

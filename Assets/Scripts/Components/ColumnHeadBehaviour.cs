@@ -1,7 +1,10 @@
+using PlotFourVR.Controllers;
+using PlotFourVR.Models;
+using PlotFourVR.Views;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Components
 {
     [RequireComponent(typeof(AudioSource))]
     public class ColumnHeadBehaviour : MonoBehaviour
@@ -18,20 +21,20 @@ namespace PlotFourVR
 
         private Queue<Disk> diskPool;
 
-        private RuntimeController runtimeController;
-        private Grid grid;
+        private GameLifecycleController lifecycle;
+        private GridView gridView;
         private AudioSource audioSource;
 
-        public void Initialize(RuntimeController runtimeController, Grid grid, int columnIndex, int rowCount)
+        public void Initialize(GameLifecycleController lifecycle, GridView gridView, int columnIndex, int rowCount)
         {
-            this.runtimeController = runtimeController;
-            this.grid = grid;
+            this.lifecycle = lifecycle;
+            this.gridView = gridView;
             this.columnIndex = columnIndex;
             this.rowCount = rowCount;
 
-            runtimeController.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
-            runtimeController.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
+            lifecycle.EventBus.InteractionEvents.NodeHoverEntered += OnNodeHoverEntered;
+            lifecycle.EventBus.InteractionEvents.NodeHoverExited += OnNodeHoverExited;
+            lifecycle.EventBus.InteractionEvents.NodeTypeChanged += OnNodeTypeChanged;
 
             audioSource = GetComponent<AudioSource>();
 
@@ -51,9 +54,9 @@ namespace PlotFourVR
 
         private void OnDestroy()
         {
-            runtimeController.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
-            runtimeController.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
-            runtimeController.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
+            lifecycle.EventBus.InteractionEvents.NodeHoverEntered -= OnNodeHoverEntered;
+            lifecycle.EventBus.InteractionEvents.NodeHoverExited -= OnNodeHoverExited;
+            lifecycle.EventBus.InteractionEvents.NodeTypeChanged -= OnNodeTypeChanged;
         }
 
         private void OnNodeHoverEntered(Node node)
@@ -76,7 +79,7 @@ namespace PlotFourVR
             if (node.ColumnIndex != columnIndex || diskPool.Count == 0) return;
 
             Disk disk = diskPool.Dequeue();
-            Vector3 targetPos = grid.GetNodeTransform(node).position;
+            Vector3 targetPos = gridView.GetTransform(node).position;
             ShowAndHighlight(disk);
 
             float volume = Mathf.Clamp01((float)(rowCount - node.RowIndex) / rowCount);
@@ -87,7 +90,7 @@ namespace PlotFourVR
         private void ShowAndHighlight(Disk disk)
         {
             disk.Show();
-            NodeType type = runtimeController.CurrentState switch
+            NodeType type = lifecycle.CurrentState switch
             {
                 StateType.PlayerOneTurn => NodeType.Yellow,
                 StateType.PlayerTwoTurn => NodeType.Red,
