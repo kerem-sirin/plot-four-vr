@@ -10,30 +10,23 @@
 **On default settings** you can:
 
 - Play against a friend over your local network on a **9 × 7** grid  
-- Or tweak the grid size and challenge our AI “Hal9000”  
+- Or tweak the grid size and challenge our AI 
 
 ---
 
-## Table of Contents
+##Technical Details
+Unity: 2021.3.34f1
+XR Interaction Toolkit: 3.1.1
+DOTween: 1.2.765
+Scripting Runtime: C# 8.0+
 
-1. [Demo](#demo)  
-2. [Installation](#installation)  
-3. [Technical Details](#technical-details)  
-4. [Acknowledgements](#acknowledgements)  
-5. [License](#license)  
+##Platform Agnostic:
 
----
+-The default build target is Android (Meta Quest)
+-Swap to HTC Vive, SteamVR, Samsung VR, etc. via
+-Project Settings → XR Plug-in Management → OpenXR → OpenXR Feature Groups
 
-## Demo
-
-![Plot Four VR in action](docs/screenshot.png)  
-*Hover over a column, click to drop, watch the VR discs fly!*
-
----
-
-## Installation
-
-1. **Clone** this repository  
-   ```bash
-   git clone https://github.com/yourusername/plot-four-vr.git
-   cd plot-four-vr
+##Acknowledgements
+Inspired by the classic [Connect Four](https://en.wikipedia.org/wiki/Connect_Four).
+Built with Unity XR Interaction Toolkit [(docs)](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@3.1/manual/index.html).
+Animated using [DOTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676).
