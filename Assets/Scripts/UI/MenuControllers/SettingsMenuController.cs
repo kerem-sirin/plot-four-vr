@@ -1,8 +1,9 @@
+using PlotFourVR.UI.SettingsListeners;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR.MenuControllers
+namespace PlotFourVR.UI.MenuControllers
 {
     public class SettingsMenuController : MenuController
     {

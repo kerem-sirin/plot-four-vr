@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR.MenuControllers
+namespace PlotFourVR.UI.MenuControllers
 {
     public class GameOverPanelController : MenuController
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PlotFourVR.MenuControllers
+namespace PlotFourVR.UI.MenuControllers
 {
     public class TurnPanelController : MenuController
     {

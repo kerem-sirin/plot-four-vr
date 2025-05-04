@@ -1,4 +1,4 @@
-namespace PlotFourVR
+namespace PlotFourVR.UI.SettingsListeners
 {
     public class SettinsWarningPanelBehaviour : SettingsListener
     {

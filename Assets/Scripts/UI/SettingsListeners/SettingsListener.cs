@@ -1,7 +1,7 @@
-using PlotFourVR.MenuControllers;
+using PlotFourVR.UI.MenuControllers;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI.SettingsListeners
 {
     public abstract class SettingsListener : MonoBehaviour
     {
