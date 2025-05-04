@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 namespace PlotFourVR
@@ -20,43 +18,29 @@ namespace PlotFourVR
 
         public async Task<Node> DecideMoveAsync()
         {
-            // Run all the logic off the UI thread
-            Node result = await Task.Run(async () =>
+            var sw = Stopwatch.StartNew();
+
+            // Run all decision logic synchronously on a background thread
+            Node move = await Task.Run(() =>
             {
-                var phases = new (string phaseName, Func<Node> step)[]
-                {
-                ("Checking for Win",       () => MakeWinningMove(nodeParent.GetAvailableNodes())),
-                ("Blocking Opponent Win",  () => BlockOpponentsWinningMove(nodeParent.GetAvailableNodes())),
-                ("Looking for Fork",       () => CreateFork(nodeParent.GetAvailableNodes())),
-                ("Blocking Opponent Fork", () => BlockOpponentsFork(nodeParent.GetAvailableNodes())),
-                ("Taking Center",          () => TryToTakeCenter(nodeParent.GetAvailableNodes())),
-                ("Picking Random",         () => PickRandom(nodeParent.GetAvailableNodes()))
-                };
-
-                foreach (var (phaseName, step) in phases)
-                {
-                    var sw = Stopwatch.StartNew();
-                    Node move = step();
-                    sw.Stop();
-
-                    // enforce minimum delay
-                    int delay = MinPhaseTimeMs - (int)sw.ElapsedMilliseconds;
-                    if (delay > 0)
-                    {
-                        await Task.Delay(delay);
-                    }
-
-                    // if this phase found a move, return it immediately
-                    if (move != null)
-                    {
-                        return move;
-                    }
-                }
-                // should never hit here, but just in case
-                Debug.LogError($"No move found in any phase. Returning null.");
-                return null;
+                var avail = nodeParent.GetAvailableNodes();
+                if (MakeWinningMove(avail) is Node win) return win;
+                if (BlockOpponentsWinningMove(avail) is Node blk) return blk;
+                if (CreateFork(avail) is Node fork) return fork;
+                if (BlockOpponentsFork(avail) is Node bfork) return bfork;
+                if (TryToTakeCenter(avail) is Node center) return center;
+                return PickRandom(avail);
             });
-            return result;
+
+            sw.Stop();
+            // enforce a single total “think time” rather than per-phase
+            int remaining = MinPhaseTimeMs - (int)sw.ElapsedMilliseconds;
+            if (remaining > 0)
+            {
+                await Task.Delay(remaining);
+            }
+
+            return move;
         }
 
         private Node PickRandom(List<Node> availableNodes)
@@ -165,7 +149,7 @@ namespace PlotFourVR
         private Node TryToTakeCenter(List<Node> availableNodes)
         {
             // Get board width and center
-            int width = availableNodes.Count;
+            int width = nodeParent.ColumnCount;
             int centerCol = width / 2;
 
             // build a dictionary of available nodes by column

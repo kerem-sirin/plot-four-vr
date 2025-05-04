@@ -14,6 +14,7 @@ namespace PlotFourVR
         [SerializeField] private Transform columnHead;
 
         private int rowCount;
+        public int ColumnCount => columnCount;
         private int columnCount;
         private int winLength;
 
