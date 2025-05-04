@@ -1,17 +1,18 @@
+using PlotFourVR.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Random = UnityEngine.Random;
 
-namespace PlotFourVR
+namespace PlotFourVR.AI
 {
-    public class DecideComputerMovement
+    public class AiMoveDecider
     {
         private const int MinPhaseTimeMs = 500;
         private GridModel gridModel;
 
-        public DecideComputerMovement(GridModel gridModel)
+        public AiMoveDecider(GridModel gridModel)
         {
             this.gridModel = gridModel;
         }

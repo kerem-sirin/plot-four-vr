@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Helpers
 {
     public static class GridLayoutService
     {

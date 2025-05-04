@@ -1,3 +1,4 @@
+using PlotFourVR.Controllers;
 using PlotFourVR.UI.MenuControllers;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace PlotFourVR.UI
     public class UiMainController : MonoBehaviour
     {
         private MenuController[] menuPanels;
-        public void Initialize(GameLifescycleController lifecycle)
+        public void Initialize(GameLifecycleController lifecycle)
         {
             // Initialize UI elements and event listeners here
             menuPanels = GetComponentsInChildren<MenuController>(true);

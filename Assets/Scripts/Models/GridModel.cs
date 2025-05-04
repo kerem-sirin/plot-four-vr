@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PlotFourVR
+namespace PlotFourVR.Models
 {
     /// <summary>
     /// Holds grid data and game-logic (nodes, win checks, availability).

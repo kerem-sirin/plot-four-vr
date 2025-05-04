@@ -1,7 +1,11 @@
+using PlotFourVR.Components;
+using PlotFourVR.Controllers;
+using PlotFourVR.Helpers;
+using PlotFourVR.Models;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Views
 {
     /// <summary>
     /// Renders a GridModel into the scene (nodes, column heads) and exposes Transform lookup.
@@ -22,7 +26,7 @@ namespace PlotFourVR
             this.columnHeadPrefab = columnHeadPrefab;
         }
 
-        public void Build(GridModel model, GameLifescycleController lifecycle)
+        public void Build(GridModel model, GameLifecycleController lifecycle)
         {
             float spacing = GridLayoutService.Spacing;
             parent.position = new Vector3(-((model.ColumnCount - 1) * spacing) / 2, 0, 0);
@@ -30,12 +34,12 @@ namespace PlotFourVR
             InstantiateNodes(model, lifecycle, spacing);
         }
 
-        private void InstantiateColumnHeads(GridModel model, GameLifescycleController lifecycle, float spacing)
+        private void InstantiateColumnHeads(GridModel model, GameLifecycleController lifecycle, float spacing)
         {
             float headY = model.RowCount * spacing + spacing / 5f;
             for (int c = 0; c < model.ColumnCount; c++)
             {
-                Transform go = GameObject.Instantiate(columnHeadPrefab, parent);
+                Transform go = Object.Instantiate(columnHeadPrefab, parent);
                 go.name = $"ColumnHead_{c}";
                 go.localPosition = new Vector3(c * spacing, headY, 0);
                 ColumnHeadBehaviour comp = go.GetComponent<ColumnHeadBehaviour>();
@@ -44,13 +48,13 @@ namespace PlotFourVR
             }
         }
 
-        private void InstantiateNodes(GridModel model, GameLifescycleController lifecycle, float spacing)
+        private void InstantiateNodes(GridModel model, GameLifecycleController lifecycle, float spacing)
         {
             for (int r = 0; r < model.RowCount; r++)
                 for (int c = 0; c < model.ColumnCount; c++)
                 {
                     var node = model.GetNode(r, c);
-                    Transform go = GameObject.Instantiate(nodePrefab, parent);
+                    Transform go = Object.Instantiate(nodePrefab, parent);
                     go.name = $"Node_{r}_{c}";
                     go.localPosition = new Vector3(c * spacing, r * spacing, 0);
                     NodeVisual visual = go.GetComponent<NodeVisual>();

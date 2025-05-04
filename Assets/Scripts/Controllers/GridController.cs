@@ -1,12 +1,13 @@
 using DG.Tweening;
-using NUnit.Framework;
+using PlotFourVR.AI;
+using PlotFourVR.Helpers;
+using PlotFourVR.Models;
 using PlotFourVR.UI;
-using System.Collections.Generic;
-using System.Linq;
+using PlotFourVR.Views;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Controllers
 {
     /// <summary>
     /// Coordinates model, view, input, AI, and game rules.
@@ -18,22 +19,22 @@ namespace PlotFourVR
 
         private GridModel model;
         private GridView view;
-        private GameLifescycleController lifecycle;
-        private DecideComputerMovement ai;
+        private GameLifecycleController lifecycle;
+        private AiMoveDecider ai;
 
         private bool canPlay;
         public int PlayedCount { get; private set; }
         private int totalCount;
         public float ElapsedTime { get; private set; }
 
-        public void Initialize(GameLifescycleController lifecycle)
+        public void Initialize(GameLifecycleController lifecycle)
         {
             this.lifecycle = lifecycle;
             model = new GridModel(lifecycle.RowCount, lifecycle.ColumnCount, lifecycle.WinLength);
             view = new GridView(transform, nodePrefab, columnHeadPrefab);
             view.Build(model, lifecycle);
 
-            ai = new DecideComputerMovement(model);
+            ai = new AiMoveDecider(model);
 
             lifecycle.GameStateChanged += OnStateChanged;
             lifecycle.EventBus.InteractionEvents.NodeInteracted += OnNodeInteracted;

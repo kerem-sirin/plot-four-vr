@@ -1,3 +1,4 @@
+using PlotFourVR.Models;
 using System;
 
 namespace PlotFourVR.Events

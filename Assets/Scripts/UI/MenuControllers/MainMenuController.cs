@@ -1,3 +1,5 @@
+using PlotFourVR.Controllers;
+using PlotFourVR.Helpers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -81,7 +83,7 @@ namespace PlotFourVR.UI.MenuControllers
 
         private void OnWinLengthChanged(int obj)
         {
-            headerText.SetText($"Plot {Utility.NumberToText(obj)} VR");
+            headerText.SetText($"Plot {NumberExtensions.ToWords(obj)} VR");
             winLengthInfoText.SetText($"{obj.ToString()} Tiles");
         }
     }

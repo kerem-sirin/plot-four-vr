@@ -1,7 +1,10 @@
+using PlotFourVR.Controllers;
+using PlotFourVR.Models;
+using PlotFourVR.Views;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Components
 {
     [RequireComponent(typeof(AudioSource))]
     public class ColumnHeadBehaviour : MonoBehaviour
@@ -18,11 +21,11 @@ namespace PlotFourVR
 
         private Queue<Disk> diskPool;
 
-        private GameLifescycleController lifecycle;
+        private GameLifecycleController lifecycle;
         private GridView gridView;
         private AudioSource audioSource;
 
-        public void Initialize(GameLifescycleController lifecycle, GridView gridView, int columnIndex, int rowCount)
+        public void Initialize(GameLifecycleController lifecycle, GridView gridView, int columnIndex, int rowCount)
         {
             this.lifecycle = lifecycle;
             this.gridView = gridView;

@@ -1,4 +1,4 @@
-namespace PlotFourVR
+namespace PlotFourVR.Models
 {
     public class Node
     {

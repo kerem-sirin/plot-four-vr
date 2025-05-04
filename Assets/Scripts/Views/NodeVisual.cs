@@ -1,18 +1,21 @@
+using PlotFourVR.Components;
+using PlotFourVR.Controllers;
+using PlotFourVR.Models;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-namespace PlotFourVR
+namespace PlotFourVR.Views
 {
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class NodeVisual : MonoBehaviour
     {
         private Node node;
         private XRSimpleInteractable xRSimpleInteractable;
-        private GameLifescycleController lifecycle;
+        private GameLifecycleController lifecycle;
         private ParticleSystem winningParticleSystem;
 
-        public void Initialize(GameLifescycleController lifecycle,Node node)
+        public void Initialize(GameLifecycleController lifecycle,Node node)
         {
             this.lifecycle = lifecycle;
 
@@ -151,7 +154,10 @@ namespace PlotFourVR
             }
         }
     }
+}
 
+namespace PlotFourVR
+{
     public enum NodeType
     {
         Empty,

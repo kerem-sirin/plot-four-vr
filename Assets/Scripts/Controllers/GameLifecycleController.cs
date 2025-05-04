@@ -4,12 +4,12 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PlotFourVR
+namespace PlotFourVR.Controllers
 {
     /// <summary>
     /// Manages high-level game states, grid setup, and UI transitions.
     /// </summary>
-    public class GameLifescycleController : MonoBehaviour
+    public class GameLifecycleController : MonoBehaviour
     {
         public const int DEFAULT_GRID_WIDTH = 9;
         public const int DEFAULT_GRID_HEIGHT = 7;

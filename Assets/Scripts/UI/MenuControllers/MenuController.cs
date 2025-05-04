@@ -1,4 +1,5 @@
 using DG.Tweening;
+using PlotFourVR.Controllers;
 using UnityEngine;
 
 namespace PlotFourVR.UI.MenuControllers
@@ -11,9 +12,9 @@ namespace PlotFourVR.UI.MenuControllers
 
         protected CanvasGroup parentCanvasGroup;  
 
-        protected GameLifescycleController lifecycle;
+        protected GameLifecycleController lifecycle;
 
-        internal virtual void Initialize(GameLifescycleController lifecycle)
+        internal virtual void Initialize(GameLifecycleController lifecycle)
         {
             this.lifecycle = lifecycle;
 
