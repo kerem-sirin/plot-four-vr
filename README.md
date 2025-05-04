@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#license)  
 [![Unity Version](https://img.shields.io/badge/Unity-6.6000.0.34f1-blue.svg)](#technical-details)  
 
-A fully immersive VR twist on classic **Connect Four**—drop discs in 3D, face off against friends or our AI opponent, and get animated feedback on every move. Play in default mode on a local 9×7 grid, or tweak the grid size and challenge our built-in AI.
+A fully immersive VR twist on classic **Plot Four**—drop discs in 3D, face off against friends or our AI opponent, and get animated feedback on every move. Play in default mode on a local 9×7 grid, or tweak the grid size and challenge our built-in AI.
 
 ![PlotFourVrSS](https://github.com/user-attachments/assets/02e9584d-fe8a-48b1-8e3e-1f828a286c49)
 
