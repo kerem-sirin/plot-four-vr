@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.MenuControllers
 {
     public class SettingsMenuController : MenuController
     {

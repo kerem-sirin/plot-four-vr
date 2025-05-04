@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.MenuControllers
 {
     public class MainMenuController : MenuController
     {
