@@ -2,11 +2,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlotFourVR
+namespace PlotFourVR.UI
 {
     public class SliderBehaviour : MonoBehaviour
     {
-
         [SerializeField] private TextMeshProUGUI sliderValueText;
         [SerializeField] private Slider slider;
         public Slider Slider => slider;
@@ -21,7 +20,6 @@ namespace PlotFourVR
             // Set the initial value of the slider
             sliderValueText.text = slider.value.ToString();
         }
-
 
         private void OnDestroy()
         {
