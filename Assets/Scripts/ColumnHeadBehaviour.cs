@@ -19,13 +19,13 @@ namespace PlotFourVR
         private Queue<Disk> diskPool;
 
         private GameLifescycleController lifecycle;
-        private Grid grid;
+        private GridView gridView;
         private AudioSource audioSource;
 
-        public void Initialize(GameLifescycleController lifecycle, Grid grid, int columnIndex, int rowCount)
+        public void Initialize(GameLifescycleController lifecycle, GridView gridView, int columnIndex, int rowCount)
         {
             this.lifecycle = lifecycle;
-            this.grid = grid;
+            this.gridView = gridView;
             this.columnIndex = columnIndex;
             this.rowCount = rowCount;
 
@@ -76,7 +76,7 @@ namespace PlotFourVR
             if (node.ColumnIndex != columnIndex || diskPool.Count == 0) return;
 
             Disk disk = diskPool.Dequeue();
-            Vector3 targetPos = grid.GetNodeTransform(node).position;
+            Vector3 targetPos = gridView.GetTransform(node).position;
             ShowAndHighlight(disk);
 
             float volume = Mathf.Clamp01((float)(rowCount - node.RowIndex) / rowCount);

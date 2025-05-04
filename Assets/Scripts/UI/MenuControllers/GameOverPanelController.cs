@@ -70,8 +70,8 @@ namespace PlotFourVR.UI.MenuControllers
                 resultText.SetText("It's a Draw!");
             }
 
-            tilesPlayedText.SetText(lifecycle.Grid.PlayedTileCount.ToString());
-            playTimeText.SetText(FormatTime(lifecycle.Grid.PlayTime));
+            tilesPlayedText.SetText(lifecycle.GridController.PlayedCount.ToString());
+            playTimeText.SetText(FormatTime(lifecycle.GridController.ElapsedTime));
         }
 
         private string FormatTime(float playtime)

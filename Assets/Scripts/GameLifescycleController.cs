@@ -26,8 +26,8 @@ namespace PlotFourVR
         private StateType currentState;
 
         [SerializeField] private Transform gridPrefab;
-        public Grid Grid => grid;
-        private Grid grid;
+        public GridController GridController => gridController;
+        private GridController gridController;
 
         [SerializeField] private Transform uiMainPrefab;
         private UiMainController uiMainController;
@@ -128,20 +128,20 @@ namespace PlotFourVR
 
         private void StartNewGame()
         {
-            if (grid != null)
+            if (gridController != null)
             {
-                grid.Destroy();
+                gridController.Destroy();
             }
 
-            grid = Instantiate(gridPrefab).GetComponent<Grid>();
-            grid.Initialize(this);
+            gridController = Instantiate(gridPrefab).GetComponent<GridController>();
+            gridController.Initialize(this);
         }
 
         private void EndCurrentGame()
         {
-            if (grid == null)return;
+            if (gridController == null)return;
 
-            grid.Destroy();
+            gridController.Destroy();
             _ = SetGameStateAsync(StateType.Idle);
         }
     }

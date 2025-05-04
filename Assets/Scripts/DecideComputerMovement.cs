@@ -9,18 +9,18 @@ namespace PlotFourVR
     public class DecideComputerMovement
     {
         private const int MinPhaseTimeMs = 100;
-        private Grid grid;
+        private GridModel gridModel;
 
-        public DecideComputerMovement(Grid grid)
+        public DecideComputerMovement(GridModel gridModel)
         {
-            this.grid = grid;
+            this.gridModel = gridModel;
         }
 
         public async Task<Node> DecideMoveAsync()
         {
             var sw = Stopwatch.StartNew();
 
-            var availableNodes = grid.GetAvailableNodes();
+            var availableNodes = gridModel.GetAvailableNodes();
             // Run all decision logic synchronously on a background thread
             Node move = await Task.Run(() =>
             {
@@ -80,7 +80,7 @@ namespace PlotFourVR
         private bool WouldMoveSucceed(Node node, NodeType testType)
         {
             node.NodeType = testType;
-            bool result = grid.IsBelowNeighbourOccupied(node) && grid.IsWinningMove(node);
+            bool result = gridModel.IsBelowOccupied(node) && gridModel.IsWinningMove(node);
             node.NodeType = NodeType.Empty;
             return result;
         }
@@ -97,14 +97,14 @@ namespace PlotFourVR
 
         private bool Fork(Node n, NodeType color)
         {
-            if (!grid.IsBelowNeighbourOccupied(n)) return false;
+            if (!gridModel.IsBelowOccupied(n)) return false;
             n.NodeType = color;
             int threats = 0;
-            foreach (var next in grid.GetAvailableNodes())
+            foreach (var next in gridModel.GetAvailableNodes())
             {
-                if (!grid.IsBelowNeighbourOccupied(next)) continue;
+                if (!gridModel.IsBelowOccupied(next)) continue;
                 next.NodeType = color;
-                if (grid.IsWinningMove(next)) threats++;
+                if (gridModel.IsWinningMove(next)) threats++;
                 next.NodeType = NodeType.Empty;
                 if (threats >= 2) break;
             }
@@ -115,7 +115,7 @@ namespace PlotFourVR
         private Node TryToTakeCenter(List<Node> availableNodes)
         {
             // Get board width and center
-            int width = grid.ColumnCount;
+            int width = gridModel.ColumnCount;
             int centerCol = width / 2;
 
             // build a dictionary of available nodes by column

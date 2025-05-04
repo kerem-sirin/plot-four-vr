@@ -2,6 +2,8 @@ namespace PlotFourVR
 {
     public static class Utility
     {
+        public const float NODE_SPACING = 0.2f;
+
         /// <summary>
         /// Converts a number to its English text representation.
         /// </summary>
