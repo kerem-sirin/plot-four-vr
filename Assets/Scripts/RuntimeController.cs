@@ -22,11 +22,11 @@ namespace PlotFourVR
         public StateType CurrentState => currentState;
         private StateType currentState;
 
-        [SerializeField] private Transform nodeParentTransform;
-        public NodeParent NodeParent => nodeParent;
-        private NodeParent nodeParent;
+        [SerializeField] private Transform gridPrefab;
+        public Grid Grid => grid;
+        private Grid grid;
 
-        [SerializeField] private Transform uiMainTransform;
+        [SerializeField] private Transform uiMainPrefab;
         private UiMainController uiMainController;
 
         public EventBus EventBus { get; private set; }
@@ -101,7 +101,7 @@ namespace PlotFourVR
                 {
                     Destroy(uiMainController.gameObject);
                 }
-                uiMainController = Instantiate(uiMainTransform).GetComponent<UiMainController>();
+                uiMainController = Instantiate(uiMainPrefab).GetComponent<UiMainController>();
                 uiMainController.Initialize(this);
                 SetCurrentState(StateType.Idle);
             }
@@ -113,21 +113,21 @@ namespace PlotFourVR
             else if (currentState == StateType.GameStarting)
             {
                 // Settings are already set, create the grid in this state
-                if (nodeParent != null)
+                if (grid != null)
                 {
-                    nodeParent.Destroy();
+                    grid.Destroy();
                 }
 
                 // instantiate nodeParentTransform
-                nodeParent = Instantiate(nodeParentTransform).GetComponent<NodeParent>();
-                nodeParent.Initialize(this);
+                grid = Instantiate(gridPrefab).GetComponent<Grid>();
+                grid.Initialize(this);
             }
             else if (currentState == StateType.EndingCurrentGame)
             {
                 // Destroy the grid and go back to the main menu& settings
-                if (nodeParent == null) return;
+                if (grid == null) return;
 
-                nodeParent.Destroy();
+                grid.Destroy();
                 SetCurrentState(StateType.Idle);
             }
             GameStateChanged?.Invoke(currentState);

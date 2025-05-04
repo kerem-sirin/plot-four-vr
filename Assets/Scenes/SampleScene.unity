@@ -1169,8 +1169,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c959717f743ae24db814da9d9958113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodeParentTransform: {fileID: 5463865134415908064, guid: acbdf3fdef1192d4d991e45fbe88c33a, type: 3}
-  uiMainTransform: {fileID: 7481838417415364669, guid: 117033618b896cf4b889ac1c7633478f, type: 3}
+  gridPrefab: {fileID: 5463865134415908064, guid: acbdf3fdef1192d4d991e45fbe88c33a, type: 3}
+  uiMainPrefab: {fileID: 7481838417415364669, guid: 117033618b896cf4b889ac1c7633478f, type: 3}
 --- !u!4 &1665983187
 Transform:
   m_ObjectHideFlags: 0

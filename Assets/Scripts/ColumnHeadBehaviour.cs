@@ -23,13 +23,13 @@ namespace PlotFourVR
         private List<NodeDisk> nodeDisks;
 
         private RuntimeController runtimeController;
-        private NodeParent nodeParent;
+        private Grid grid;
         private AudioSource audioSource;
 
-        public void Initialize(RuntimeController runtimeController, NodeParent nodeParent, int columnIndex, int rowCount)
+        public void Initialize(RuntimeController runtimeController, Grid grid, int columnIndex, int rowCount)
         {
             this.runtimeController = runtimeController;
-            this.nodeParent = nodeParent;
+            this.grid = grid;
             this.columnIndex = columnIndex;
             this.rowCount = rowCount;
 
@@ -84,7 +84,7 @@ namespace PlotFourVR
             if (node.ColumnIndex != columnIndex) return;
 
             // move the disk to the node position
-            Vector3 targetPosition = nodeParent.GetNodeTransform(node).position;
+            Vector3 targetPosition = grid.GetNodeTransform(node).position;
 
             if (nodeDisks.Count == 0)
             {

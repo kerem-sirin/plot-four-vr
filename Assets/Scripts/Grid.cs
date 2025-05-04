@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -7,7 +6,7 @@ using PlotFourVR.UI;
 
 namespace PlotFourVR
 {
-    public class NodeParent : MonoBehaviour
+    public class Grid : MonoBehaviour
     {
         private const float NODE_SPACING = 0.2f; // Space between nodes
 

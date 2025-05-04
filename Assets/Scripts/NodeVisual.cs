@@ -100,7 +100,6 @@ namespace PlotFourVR
         {
             // Show the node disk at the column head position
             runtimeController.EventBus.InteractionEvents.InvokeNodeHoverEntered(node);
-
         }
 
         private void OnHoverExited(HoverExitEventArgs arg0)
