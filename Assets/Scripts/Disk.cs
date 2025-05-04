@@ -5,7 +5,7 @@ namespace PlotFourVR
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(AudioSource))]
-    public class NodeDisk : MonoBehaviour
+    public class Disk : MonoBehaviour
     {
         [Header("Disk Materials")]
         [SerializeField] private Material yellowDiskMaterial;
@@ -20,51 +20,35 @@ namespace PlotFourVR
         private MeshRenderer meshRenderer;
         private AudioSource audioSource;
         private TrailRenderer trailRenderer;
+
         private void Awake()
         {
             meshRenderer = GetComponent<MeshRenderer>();
             audioSource = GetComponent<AudioSource>();
             trailRenderer = GetComponentInChildren<TrailRenderer>();
 
-            // set a random z rotation
-            float randomZRotation = Random.Range(0f, 360f);
-            transform.rotation = Quaternion.Euler(0f, 0f, randomZRotation);
+            RandomizeRotation();
         }
 
-        public void SetPosition(Vector3 position)
+        private void RandomizeRotation()
         {
-            transform.position = position;
+            float randomZ = Random.Range(0f, 360f);
+            transform.localRotation = Quaternion.Euler(0f, 0f, randomZ);
         }
 
-        public void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        public void Show()
-        {
-            gameObject.SetActive(true);
-        }
+        public void SetPosition(Vector3 position) => transform.position = position;
+        public void Hide() => gameObject.SetActive(false);
+        public void Show() => gameObject.SetActive(true);
 
         public void SetMaterial(NodeType nodeType)
         {
-            // Set the material based on the node type
-            if (nodeType == NodeType.Red)
+            (meshRenderer.material, trailRenderer.material) = nodeType switch
             {
-                meshRenderer.material = redDiskMaterial;
-                trailRenderer.material = redTrailMaterial;
-
-            }
-            else if (nodeType == NodeType.Yellow)
-            {
-                meshRenderer.material = yellowDiskMaterial;
-                trailRenderer.material = yellowTrailMaterial;
-            }
-            else if (nodeType == NodeType.Green)
-            {
-                meshRenderer.material = greenDiskMaterial;
-                trailRenderer.material = greenTrailMaterial;
-            }
+                NodeType.Red => (redDiskMaterial, redTrailMaterial),
+                NodeType.Yellow => (yellowDiskMaterial, yellowTrailMaterial),
+                NodeType.Green => (greenDiskMaterial, greenTrailMaterial),
+                _ => (meshRenderer.material, trailRenderer.material)
+            };
         }
 
         public void MoveToSlot(Vector3 position, float normalizedIndexDistance)

@@ -20,7 +20,7 @@ namespace PlotFourVR
         private int columnIndex; // The index of the column this head belongs to
         private int rowCount; // The number of rows in the grid
 
-        private List<NodeDisk> nodeDisks;
+        private List<Disk> disks;
 
         private RuntimeController runtimeController;
         private Grid grid;
@@ -40,12 +40,12 @@ namespace PlotFourVR
             audioSource = GetComponent<AudioSource>();
 
             // create disk pool 
-            nodeDisks = new List<NodeDisk>(this.rowCount);
+            disks = new List<Disk>(this.rowCount);
             for (int i = 0; i < this.rowCount; i++)
             {
-                NodeDisk disk = Instantiate(diskPrefab, transform).GetComponent<NodeDisk>();
+                Disk disk = Instantiate(diskPrefab, transform).GetComponent<Disk>();
                 disk.Hide();
-                nodeDisks.Add(disk);
+                disks.Add(disk);
             }
         }
 
@@ -61,12 +61,12 @@ namespace PlotFourVR
             if (node.ColumnIndex != columnIndex) return;
 
             // get the first disk from the queue
-            if (nodeDisks.Count == 0)
+            if (disks.Count == 0)
             {
                 Debug.LogWarning($"No disks available to highlight for pos: r{node.RowIndex}-c{node.ColumnIndex}");
                 return;
             }
-            ShowDiskAndSetMaterial(nodeDisks[0]);
+            ShowDiskAndSetMaterial(disks[0]);
             PlaySfx(hoverSfx);
         }
 
@@ -75,8 +75,8 @@ namespace PlotFourVR
             if (node.ColumnIndex != columnIndex) return;
 
             // defensive check for the last disk, that is not going to be hidden
-            if (nodeDisks.Count == 0) return;
-            nodeDisks[0].Hide();
+            if (disks.Count == 0) return;
+            disks[0].Hide();
         }
 
         private void OnNodeTypeChanged(Node node)
@@ -86,33 +86,33 @@ namespace PlotFourVR
             // move the disk to the node position
             Vector3 targetPosition = grid.GetNodeTransform(node).position;
 
-            if (nodeDisks.Count == 0)
+            if (disks.Count == 0)
             {
                 Debug.LogWarning($"No disks available to move for pos: r{node.RowIndex}-c{node.ColumnIndex}");
                 return;
             }
-            ShowDiskAndSetMaterial(nodeDisks[0]);
+            ShowDiskAndSetMaterial(disks[0]);
             // normalize the distance as row index
             float normalizedIndexDistance = ((float)(rowCount - node.RowIndex) / rowCount);
-            nodeDisks[0].MoveToSlot(targetPosition, normalizedIndexDistance);
-            nodeDisks.RemoveAt(0);
+            disks[0].MoveToSlot(targetPosition, normalizedIndexDistance);
+            disks.RemoveAt(0);
         }
 
-        private void ShowDiskAndSetMaterial(NodeDisk nodeDisk)
+        private void ShowDiskAndSetMaterial(Disk disk)
         {
-            nodeDisk.Show();
+            disk.Show();
             // Set the highlight material depending on the player turn
             if (runtimeController.CurrentState == StateType.PlayerOneTurn)
             {
-                nodeDisk.SetMaterial(NodeType.Yellow);
+                disk.SetMaterial(NodeType.Yellow);
             }
             else if (runtimeController.CurrentState == StateType.PlayerTwoTurn)
             {
-                nodeDisk.SetMaterial(NodeType.Red);
+                disk.SetMaterial(NodeType.Red);
             }
             else if (runtimeController.CurrentState == StateType.PlayerThreeTurn)
             {
-                nodeDisk.SetMaterial(NodeType.Green);
+                disk.SetMaterial(NodeType.Green);
             }
         }
 

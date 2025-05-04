@@ -13,20 +13,35 @@ namespace PlotFourVR
         [SerializeField] private Material hoverMaterial;
 
         private MeshRenderer meshRenderer;
+        XRSimpleInteractable xRSimpleInteractable;
 
         public void Initialize(XRSimpleInteractable xRSimpleInteractable, VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
         {
-            bool isRightMesh = IsRightMesh(verticalAlignment, horizontalAlignment);
-            gameObject.SetActive(isRightMesh);
-            if (!isRightMesh) return;
+            // determine what kind of mesh this should be
+            TileMeshType neededType = DetermineMeshType(verticalAlignment, horizontalAlignment);
+            bool isActive = neededType == tileMeshType;
+            gameObject.SetActive(isActive);
+            if (!isActive) return;
 
+            // cache renderer & set idle material
             meshRenderer = GetComponent<MeshRenderer>();
             meshRenderer.material = idleMaterial;
-            RotateSelf(verticalAlignment, horizontalAlignment);
+
+            // apply correct orientation
+            float rotZ = DetermineRotationZ(verticalAlignment, horizontalAlignment);
+            transform.localRotation = Quaternion.Euler(0f, 0f, rotZ);
             // subscribe to the node's hover events
+            this.xRSimpleInteractable = xRSimpleInteractable;
+            this.xRSimpleInteractable.hoverEntered.AddListener(OnHoverEntered);
+            this.xRSimpleInteractable.hoverExited.AddListener(OnHoverExited);
+        }
+
+        private void OnDestroy()
+        {
+            // unsubscribe from the hover events
+            if (xRSimpleInteractable == null) return;
             xRSimpleInteractable.hoverEntered.AddListener(OnHoverEntered);
             xRSimpleInteractable.hoverExited.AddListener(OnHoverExited);
-
         }
 
         private void OnHoverEntered(HoverEnterEventArgs arg0)
@@ -41,75 +56,46 @@ namespace PlotFourVR
             meshRenderer.material = idleMaterial;
         }
 
-        // toggles self based on the node position in the grid
-        private bool IsRightMesh(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
-        {
-            // enable/disable the tile mesh based on the node position
-            if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
-                (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Left) ||
-                (verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Right) ||
-                (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Right))
+        private TileMeshType DetermineMeshType(VerticalAlignment v, HorizontalAlignment h)
+            => (v, h) switch
             {
-                // any corner
-                return tileMeshType == TileMeshType.Corner;
-            }
-            else if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center) ||
-                   (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Center) ||
-                   (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Left) ||
-                   (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Right))
-            {
-                // any side
-                return tileMeshType == TileMeshType.Side;
-            }
-            else
-            {
-                return tileMeshType == TileMeshType.Center;
-            }
-        }
+                // corners
+                (VerticalAlignment.Top, HorizontalAlignment.Left) => TileMeshType.Corner,
+                (VerticalAlignment.Top, HorizontalAlignment.Right) => TileMeshType.Corner,
+                (VerticalAlignment.Bottom, HorizontalAlignment.Left) => TileMeshType.Corner,
+                (VerticalAlignment.Bottom, HorizontalAlignment.Right) => TileMeshType.Corner,
 
-        // rotates self based on the node position in the grid
-        private void RotateSelf(VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
-        {
-            float rotationZ = 0f;
-            // rotate the tile mesh based on the node position
-            if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Left) ||
-                (verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Center))
+                // sides
+                (VerticalAlignment.Top, HorizontalAlignment.Center) => TileMeshType.Side,
+                (VerticalAlignment.Middle, HorizontalAlignment.Left) => TileMeshType.Side,
+                (VerticalAlignment.Middle, HorizontalAlignment.Right) => TileMeshType.Side,
+                (VerticalAlignment.Bottom, HorizontalAlignment.Center) => TileMeshType.Side,
+
+                // center of the grid
+                _ => TileMeshType.Center,
+            };
+
+        private float DetermineRotationZ( VerticalAlignment v, HorizontalAlignment h) 
+            => (v, h) switch
             {
-                rotationZ = -90f;
-            }
-            else if ((verticalAlignment == VerticalAlignment.Top && horizontalAlignment == HorizontalAlignment.Right) ||
-                    (verticalAlignment == VerticalAlignment.Middle && horizontalAlignment == HorizontalAlignment.Right))
-            {
-                rotationZ = 180f;
-            }
-            else if ((verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Right) ||
-                    (verticalAlignment == VerticalAlignment.Bottom && horizontalAlignment == HorizontalAlignment.Center))
-            {
-                rotationZ = 90f;
-            }
-            transform.transform.localRotation = Quaternion.Euler(0f, 0f, rotationZ);
-        }
+                // rotate -90° for top-left & top-center
+                (VerticalAlignment.Top, HorizontalAlignment.Left) => -90f,
+                (VerticalAlignment.Top, HorizontalAlignment.Center) => -90f,
+
+                // rotate 180° for top-right & middle-right
+                (VerticalAlignment.Top, HorizontalAlignment.Right) => 180f,
+                (VerticalAlignment.Middle, HorizontalAlignment.Right) => 180f,
+
+                // rotate +90° for bottom-right & bottom-center
+                (VerticalAlignment.Bottom, HorizontalAlignment.Right) => 90f,
+                (VerticalAlignment.Bottom, HorizontalAlignment.Center) => 90f,
+
+                // no rotation needed for bottom-left & middle-left
+                _ => 0f,
+            };
     }
 
-    public enum TileMeshType
-    {
-        None,
-        Center,
-        Side,
-        Corner,
-    }
-
-    public enum VerticalAlignment
-    {
-        Top,
-        Middle,
-        Bottom,
-    }
-
-    public enum HorizontalAlignment
-    {
-        Left,
-        Center,
-        Right,
-    }
+    public enum TileMeshType { Center, Side, Corner }
+    public enum VerticalAlignment { Top, Middle, Bottom }
+    public enum HorizontalAlignment { Left, Center, Right }
 }

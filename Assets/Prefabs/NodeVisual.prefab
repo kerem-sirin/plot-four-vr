@@ -5191,7 +5191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 233f91d92777ea5489cdbe6f4b19f8b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileMeshType: 2
+  tileMeshType: 1
   idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
   hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}
 --- !u!4 &3129764668332092886 stripped
@@ -5289,7 +5289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 233f91d92777ea5489cdbe6f4b19f8b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileMeshType: 1
+  tileMeshType: 0
   idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
   hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}
 --- !u!1001 &8247292898355043705
@@ -5382,6 +5382,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 233f91d92777ea5489cdbe6f4b19f8b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileMeshType: 3
+  tileMeshType: 2
   idleMaterial: {fileID: 2100000, guid: bd9a2692d0190f84fbdab3e0a36e3cb2, type: 2}
   hoverMaterial: {fileID: 2100000, guid: dc7bb024399e0944586b28d1c5437d87, type: 2}
