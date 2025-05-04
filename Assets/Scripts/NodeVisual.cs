@@ -28,7 +28,7 @@ namespace PlotFourVR
             xRSimpleInteractable.hoverExited.AddListener(OnHoverExited);
             xRSimpleInteractable.selectEntered.AddListener(OnSelectEntered);
 
-            winningParticleSystem = GetComponentInChildren<ParticleSystem>(true);
+            winningParticleSystem = GetComponentInChildren<ParticleSystem>();
 
             // Toggle child tile mesh renderers based on node position
             TileMesh[] tileMeshes = GetComponentsInChildren<TileMesh>();
@@ -59,20 +59,13 @@ namespace PlotFourVR
                     xRSimpleInteractable.interactionLayers = 1;
                 }
             }
-            else if (stateType == StateType.None)
-            {
-                // Disable Vfx
-                if(winningParticleSystem.isPlaying)
-                {
-                    winningParticleSystem.gameObject.SetActive(false);
-                }
-            }
         }
 
+        [SerializeField] private bool isWinningNode = false; // For debugging purposes
         private void OnWinningNodeDetected(Node node)
         {
             if (this.node != node) return;
-            winningParticleSystem.gameObject.SetActive(true);
+            winningParticleSystem.Play();
             ParticleSystem.MainModule particleSystemMain = winningParticleSystem.main;
             if (node.NodeType == NodeType.Yellow)
             {

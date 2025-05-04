@@ -8,7 +8,7 @@ namespace PlotFourVR
 {
     public class DecideComputerMovement
     {
-        private const int MinPhaseTimeMs = 100;
+        private const int MinPhaseTimeMs = 500;
         private GridModel gridModel;
 
         public DecideComputerMovement(GridModel gridModel)

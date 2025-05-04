@@ -105,7 +105,7 @@ namespace PlotFourVR
         {
             EventBus.UiEvents.RequestMenuPanel(PanelType.None);
             GameStateChanged?.Invoke(StateType.None);
-            await Task.Delay(600);
+            await Task.Delay(500);
         }
 
         private async Task InitializeUIAsync()

@@ -1,5 +1,7 @@
 using DG.Tweening;
+using NUnit.Framework;
 using PlotFourVR.UI;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -80,7 +82,7 @@ namespace PlotFourVR
                     canPlay = true;
                     break;
                 case StateType.PlayerThreeTurn:
-                    canPlay = false;
+                    canPlay = true;
                     Node move = await ai.DecideMoveAsync();
                     lifecycle.EventBus.InteractionEvents.InvokeNodeInteracted(move);
                     break;
@@ -107,9 +109,9 @@ namespace PlotFourVR
             CheckEndConditions(firstAvailableNode);
         }
 
-        private void CheckEndConditions(Node last)
+        private void CheckEndConditions(Node node)
         {
-            if (model.IsWinningMove(last))
+            if (model.IsWinningMove(node))
             {
                 lifecycle.GameResult = lifecycle.CurrentState switch
                 {
@@ -117,6 +119,12 @@ namespace PlotFourVR
                     StateType.PlayerTwoTurn => ResultType.PlayerTwoWin,
                     _ => ResultType.PlayerThreeWin,
                 };
+
+                // Enable Vfx for winning Nodes
+                foreach (Node winningNode in model.GetWinningTiles(node))
+                {
+                    lifecycle.EventBus.InteractionEvents.InvokeWinningNodeDetected(winningNode);
+                }
                 _ = lifecycle.SetGameStateAsync(StateType.GameOver);
                 return;
             }
