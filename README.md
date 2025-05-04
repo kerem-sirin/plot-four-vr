@@ -1,8 +1,7 @@
 # Plot Four VR 🎮🕶️
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#license)  
-[![Unity Version](https://img.shields.io/badge/Unity-2021.3.34f1-blue.svg)](#technical-details)  
-[![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/plot-four-vr/ci.yml?branch=main)](#)
+[![Unity Version](https://img.shields.io/badge/Unity-6.6000.0.34f1-blue.svg)](#technical-details)  
 
 ![Demo](docs/demo.gif)
 
