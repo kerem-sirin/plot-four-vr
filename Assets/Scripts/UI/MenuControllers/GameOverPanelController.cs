@@ -21,10 +21,10 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
 
-            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested += OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.GridLayoutReady += OnGridLayoutReady;
         }
 
-        private void OnRepositionGridRelatedMenuPositioningRequested(Vector3 vector)
+        private void OnGridLayoutReady(Vector3 vector)
         {
             Vector3 offset = new Vector3(-0.55f, 0.5f, 0f);
             transform.position = vector;
@@ -37,7 +37,7 @@ namespace PlotFourVR.UI.MenuControllers
             playAgainButton.onClick.RemoveListener(OnPlayAgainButtonClicked);
             mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
 
-            lifecycle.EventBus.UiEvents.RepositionGridRelatedMenuPositioningRequested -= OnRepositionGridRelatedMenuPositioningRequested;
+            lifecycle.EventBus.UiEvents.GridLayoutReady -= OnGridLayoutReady;
         }
 
         private void OnMainMenuButtonClicked()

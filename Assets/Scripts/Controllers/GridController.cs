@@ -52,7 +52,7 @@ namespace PlotFourVR.Controllers
                 // get the top left node, broadcast the position for menu repositioning
                 Node topLeftNode = model.GetNode(0, 0);
                 Vector3 topLeftNodePostion = view.GetTransform(topLeftNode).position;
-                lifecycle.EventBus.UiEvents.RequestRepositionGridRelatedMenuPositioning(topLeftNodePostion);
+                lifecycle.EventBus.UiEvents.InvokeGridLayoutReady(topLeftNodePostion);
             });
         }
 
