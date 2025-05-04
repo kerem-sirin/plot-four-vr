@@ -30,3 +30,6 @@ Scripting Runtime: C# 8.0+
 Inspired by the classic [Connect Four](https://en.wikipedia.org/wiki/Connect_Four).
 Built with Unity XR Interaction Toolkit [(docs)](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@3.1/manual/index.html).
 Animated using [DOTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676).
+
+##License
+This project is licensed under the MIT License.
